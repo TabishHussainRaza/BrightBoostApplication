@@ -1,0 +1,309 @@
+﻿@{
+    ViewBag.Title = "Roles Management";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">Roles Manager</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="roles" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br />
+
+<div class="modal fade" id="addNewRoleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Add Role</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="role_name"><b>Role Name </b></label>
+                        <input type="text" id="role_name" class="form-control" name="role_name" style="width:100%" />
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary addItem" id="btnSaveitem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EditRoleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Edit Role</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="role_edit_name"><b>Role Name </b></label>
+                        <input type="text" id="role_edit_name" class="form-control" name="role_edit_name" style="width:100%" />
+
+                        <input type="text" id="role_edit_id" class="form-control" name="role_edit_id" style="display:none" />
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary updateItem" id="updateRoleItem">Update</a>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/css/sweetalert.min.css" rel="stylesheet" />
+
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/js/sweetalert.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var rolesDataTable = null;
+
+            function getAllRoles() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/Role/GetAllRoles",
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+
+                            if (rolesDataTable == null) {
+                                initializeDataTable(result);
+                            } else {
+                                updateDataTable(result);
+                            }
+
+                        } else {
+                            console.log("No roles found.");
+                        }
+                    },
+                    erro: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateDataTable(updatedData) {
+                rolesDataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeDataTable(data) {
+                rolesDataTable = $('#roles').DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Name',
+                            data: 'name'
+                        },
+                        {
+                            title: 'User Count',
+                            data: 'userCount'
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}" data-name="${row.name}">
+                                            <span class="icon text-white-50" data-id="${row.id}" data-name="${row.name}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}" data-name="${row.name}"></i></span>
+                                        </a>
+                                        <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
+                                            <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
+                                        </a>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+
+            getAllRoles();
+
+            $('#addNew').on('click', function (e) {
+                $('#addNewRoleModal').modal('show');
+                $('#btnSaveitem').on('click', function (e) {
+                    var data = {
+                        name: $('#role_name').val()
+                    };
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        url: "/Role/Create",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result) {
+                                $('#role_name').val();
+                                $('#addNewRoleModal').modal('hide');
+                                swal({
+                                    title: 'Role Added!',
+                                    text: 'Successfully Created!',
+                                    option: "success",
+                                    timer: 3000
+                                });
+                                getAllRoles();
+                            } else {
+                                console.log("no");
+                            }
+                        }
+                    });
+                });
+            });
+
+            $('#addNew').on('click', function (e) {
+                $('#addNewRoleModal').modal('show');
+                $('#btnSaveitem').on('click', function (e) {
+                    var data = {
+                        name: $('#role_name').val()
+                    };
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        url: "/Role/Create",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result) {
+                                $('#role_name').val();
+                                $('#addNewRoleModal').modal('hide');
+                                swal({
+                                    title: 'Role Added!',
+                                    text: 'Successfully Created!',
+                                    option: "success",
+                                    timer: 3000
+                                });
+                                getAllRoles();
+                            } else {
+                                console.log("no");
+                            }
+                        }
+                    });
+                });
+            });
+
+            $("#roles").on("click", ".js-delete", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to delete the role!",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "DELETE",
+                            data: data,
+                            url: "/Role/DeleteRole",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'Role Deleted!',
+                                        text: 'Successfully Deleted!',
+                                        option: "success",
+                                        timer: 3000
+                                    });
+                                    getAllRoles();
+                                } else {
+                                    swal({
+                                        title: 'Role Deletion Failed!',
+                                        text: 'Could Not be Deleted!',
+                                        option: "success",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "Role Not deleted", "error");
+                    }
+                })
+            });
+
+            $("#roles").on("click", ".js-update", function (e) {
+                var data = {
+                    id: $(e.target).data('id'),
+                    name: $(e.target).data('name'),
+                };
+                $('#role_edit_name').val(data.name);
+                $('#role_edit_id').val(data.id);
+                $('#EditRoleModal').modal('show');
+                $('#updateRoleItem').on('click', function (e) {
+                    data.name = $('#role_edit_name').val();
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        url: "/Role/UpdateRole",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result) {
+                                $('#role_edit_name').val();
+                                $('#role_edit_id').val();
+                                $('#EditRoleModal').modal('hide');
+                                swal({
+                                    title: 'Role Updated!',
+                                    text: 'Successfully Created!',
+                                    option: "success",
+                                    timer: 3000
+                                });
+                                getAllRoles();
+                            } else {
+                                console.log("no");
+                            }
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+}

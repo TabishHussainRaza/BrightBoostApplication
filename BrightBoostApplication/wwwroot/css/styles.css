@@ -1,0 +1,21 @@
+.item-selection {
+        z-index: 100000;
+}
+
+span.select2-selection .select2-selection--multiple {
+    outline: none;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    cursor: default;
+    padding-left: 15px;
+    padding-right: 10px;
+}
+.select2 {
+    width: 100% !important;
+}
+
+.select2-container--default .select2-dropdown .select2-search__field:focus, .select2-container--default .select2-search--inline .select2-search__field:focus {
+    outline: 0;
+    border: none;
+}

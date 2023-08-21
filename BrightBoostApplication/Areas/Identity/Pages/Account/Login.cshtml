@@ -1,0 +1,47 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<section>
+    <form id="account" method="post" class="form-horizontal">
+        <div style="text-align:center">
+            <p class="">Sign in to start your session</p>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" style=" text-align:center; height: 50px;"></div>
+        </div>
+        
+        <div class="row  mb-2" style="padding-left:0.5rem; padding-right:0.5rem">
+            <label asp-for="Input.Email" class="form-label"></label>
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+        </div>
+
+        <div class="row  mb-2" style="padding-left:0.5rem; padding-right:0.5rem">
+            <label asp-for="Input.Password" class="form-label"></label>
+            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+        </div>
+
+        <div class="row " style=" padding-right:0.5rem;margin-top:10px">
+            <div class="col-12" style="padding-right: 0px">
+                <input id="login-submit" type="submit" class="btn btn-primary btn-block btn-sm" value="Sign In" />
+
+            </div>
+
+        </div>
+        <br />
+        <div class="row mb-0" style="padding-left:0.5rem; padding-right:0.5rem">
+            <p style="line-height: 80%;">
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+            </p>
+        </div>
+        <div class="row mb-0" style="padding-left:0.5rem; padding-right:0.5rem">
+            <p style="line-height: 80%;">
+                <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+            </p>
+        </div>
+    </form>
+</section>

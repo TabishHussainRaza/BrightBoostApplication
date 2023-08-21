@@ -1,0 +1,579 @@
+﻿@{
+    ViewBag.Title = "Users Management";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">User Manager</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="user" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br />
+
+<div class="modal fade" id="addNewUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Add User</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="first_name"><b>First Name </b></label>
+                        <input type="text" id="first_name" class="form-control addField" name="first_name" style="width:100%" required />
+                        <span id="first_name_empty_error" class="text-danger small" style="display:none">First Name Required</span>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="label" for="last_name"><b>Last Name </b></label>
+                        <input type="text" id="last_name" class="form-control addField" name="last_name" style="width:100%" required />
+                        <span id="last_name_empty_error" class="text-danger small" style="display:none">Last Name Required</span>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="label" for="email"><b>Email </b></label>
+                        <input type="text" id="email" class="form-control addField" name="email" style="width:100%" />
+                        <span id="email_empty_error" class="text-danger small" style="display:none">Email Required</span>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="label" for="password"><b>Password</b></label>
+                        <input type="password" id="password" class="form-control addField" name="password" style="width:100%" />
+                        <span id="password_empty_error" class="text-danger small" style="display:none">Password Required</span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary addItem" id="btnSaveitem">Add</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="edit_first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control editField" id="edit_first_name" name="edit_first_name">
+                    <span id="edit_first_name_empty_error" class="text-danger small" style="display: none">First Name Required</span>
+                </div>
+                <div class="mb-3">
+                    <label for="edit_last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control editField" id="edit_last_name" name="edit_last_name">
+                    <span id="edit_last_name_empty_error" class="text-danger small" style="display: none">Last Name Required</span>
+                </div>
+                <div class="mb-3">
+                    <label for="edit_email" class="form-label">Email</label>
+                    <input type="email" class="form-control editField" id="edit_email" name="edit_email">
+                    <span id="edit_email_empty_error" class="text-danger small" style="display: none">Email Required</span>
+                </div>
+
+                <input type="hidden" class="form-control editField" id="edit_id" name="edit_id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnEditUser">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignRoleModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Assign Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Roles</label>
+                    <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
+                </div>
+
+                <input type="hidden" class="form-control assignRole" id="assignRole" name="assignRole">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAssignRole">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
+@section scripts
+    {
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var DataTable = null;
+            var allUsers = null;
+            function getAllUsers() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/User/GetAllusers",
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+                            allUsers = result;
+                            if (DataTable == null) {
+                                initializeDataTable(result);
+                            } else {
+                                updateDataTable(result);
+                            }
+
+                        } else {
+                            console.log("No Users found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateDataTable(updatedData) {
+                DataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeDataTable(data) {
+                DataTable = $('#user').DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'First name',
+                            data: 'firstName'
+                        },
+                        {
+                            title: 'Last name',
+                            data: 'lastName'
+                        },
+                        {
+                            title: 'Email',
+                            data: 'email'
+                        },
+                        {
+                            title: 'Active',
+                            render: function (data, type, row, meta) {
+
+                                var condition = row.isActive == true ? 'checked' : '';
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<input type='checkbox' class ="change_user_status" id="${row.id}_chk_status" data-id="${row.id}" ${condition}/>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-info js-assign" data-id="${row.id}">
+                                                     <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-person' style='color: white' data-id="${row.id}"></i></span>
+                                                        </a>
+                                
+                                <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
+                                             <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
+                                                </a>
+                                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
+                                                    <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
+                                                </a>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+
+            getAllUsers();
+
+            $('#addNew').on('click', function (e) {
+                $('#addNewUserModal').modal('show');
+                $('#addNewUserModal').on('hidden.bs.modal', function () {
+                    $(".addField").val("");
+                    $(".text-danger").hide();   
+                });
+                $('#btnSaveitem').on('click', function (e) {
+                    $(".text-danger").css("display", "none");
+
+                    // Check for empty fields
+                    var hasErrors = false;
+                    $(".addField").each(function () {
+                        if ($(this).val().trim() === "") {
+                            var fieldId = $(this).attr("id");
+                            $("#" + fieldId + "_empty_error").css("display", "block");
+                            hasErrors = true;
+                        }
+                    });
+
+                    if (hasErrors) {
+                        return false;
+                    } else {
+                        var firstName = $("#first_name").val();
+                        var lastName = $("#last_name").val();
+                        var email = $("#email").val();
+                        var password = $("#password").val();
+
+                        var requestData = {
+                            firstName: firstName,
+                            lastName: lastName,
+                            email: email,
+                            password: password
+                        };
+
+                        $.ajax({
+                            url: '/User/Add', 
+                            type: 'POST',
+                            data: requestData,
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response) {
+                                    $('#addNewUserModal').modal('hide');
+                                    swal({
+                                        title: 'User Added!',
+                                        text: 'Successfully Created!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllUsers();
+                                } else {
+                                    swal({
+                                        title: 'User Addition Failed!',
+                                        text: 'Could Not be Added!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            },
+                            error: function (error) {
+                                swal("Cancelled", "User Not deleted", "error");
+                            }
+                        });
+                    }
+                });
+            });
+
+            function findUserById(userId) {
+                if (allUsers) {
+                    var foundUser = allUsers.find(function (user) {
+                        return user.id === userId;
+                    });
+
+                    return foundUser ? foundUser : null;
+                }
+
+                return null;
+            }
+            $("#user").on("click", ".js-update", function (e) {
+                var user = findUserById($(e.target).data('id'));
+
+                if(user !=null){
+                    $('#edit_first_name').val(user.firstName);
+                    $('#edit_last_name').val(user.lastName);
+                    $('#edit_email').val(user.email);
+                    $('#edit_id').val(user.id);
+                    $('#editUserModal').modal('show');
+
+                    $('#editUserModal').on('hidden.bs.modal', function () {
+                        $(".editField").val("");
+                        $(".text-danger").hide();
+                    });
+
+                    $('#btnEditUser').on('click', function (e) {
+                        $(".text-danger").css("display", "none");
+
+                        var hasErrors = false;
+                        $(".editField").each(function () {
+                            if ($(this).val().trim() === "") {
+                                var fieldId = $(this).attr("id");
+                                $("#" + fieldId + "_empty_error").css("display", "block");
+                                hasErrors = true;
+                            }
+                        });
+
+                        if (hasErrors) {
+                            return false;
+                        } else {
+                            var editedData = {
+                                firstName: $("#edit_first_name").val(),
+                                lastName: $("#edit_last_name").val(),
+                                email: $("#edit_email").val(),
+                                id: $("#edit_id").val()
+                            };
+
+                            $.ajax({
+                                url: '/User/Edit',
+                                type: 'POST',
+                                data: editedData,
+                                dataType: 'json',
+                                success: function (response) {
+                                    if (response) {
+                                        $('#editUserModal').modal('hide');
+                                        swal({
+                                            title: 'User Edited!',
+                                            text: 'User information successfully updated!',
+                                            option: "success",
+                                            icon: "success",
+                                            timer: 3000
+                                        });
+                                        getAllUsers();
+                                    } else {
+                                        swal({
+                                            title: 'Edit Failed!',
+                                            text: 'User information could not be updated!',
+                                            option: "error",
+                                            icon: "error",
+                                            timer: 3000
+                                        });
+                                    }
+                                },
+                                error: function (error) {
+                                    swal("Error", "An error occurred while editing the user.", "error");
+                                }
+                            });
+                        }
+                    });
+                }
+                
+            });
+
+            $("#user").on("click", ".js-delete", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to delete the user!",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "DELETE",
+                            data: data,
+                            url: "/User/Delete",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'User Deleted!',
+                                        text: 'Successfully Deleted!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllUsers();
+                                } else {
+                                    swal({
+                                        title: 'User Deletion Failed!',
+                                        text: 'Could Not be Deleted!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "User Not deleted", "error");
+                    }
+                })
+            });
+
+            $("#user").on("click", ".change_user_status", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to change the user status?",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        data.isActive = $(`#${data.id}_chk_status`).prop("checked");
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            url: "/User/ChangeUserStatus",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'User Status Updated!',
+                                        text: 'Successfully Updated!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllUsers();
+                                } else {
+                                    swal({
+                                        title: 'User Status Change Failed!',
+                                        text: 'Could Not be Changed!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "User Status Not Updated", "error");
+                    }
+                })
+            });
+
+            $("#user").on("click", ".js-assign", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                $('#assignRoleModal').modal('show');
+                loadOptionItems(data.id);
+                $('#btnAssignRole').on('click', function (e) {
+                    var roleIds = $("#select_item_list").val();
+
+                    var requestData = {
+                        userId: data.id
+                    };
+
+                    if (roleIds && roleIds.length > 0) {
+                        requestData.RoleIds = roleIds;
+                        requestData.RoleName = $("#select_item_list").text();
+                    } else {
+                        requestData.removeAll = true;
+                    }
+
+                    $.ajax({
+                        url: "/Role/AddRoleMapping",
+                        type: "POST",
+                        data: requestData,
+                        dataType: "json",
+                        success: function (data) {
+                            $('#assignRoleModal').modal('hide');
+                            if(data){
+                                swal({
+                                    title: 'User Role(s) Updated!',
+                                    text: 'Successfully Updated!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAllUsers();
+                            } else {
+                                swal({
+                                    title: 'User Role(s) Change Failed!',
+                                    text: 'Could Not be Changed!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+
+                            console.error("Error:", status, error);
+                        },
+                    });
+                });
+
+            });
+
+            function loadOptionItems(id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Role/GetAllRoles",
+                    success: function (result) {
+                        if(result){
+                            $('#select_item_list').html('');
+                            $('#select_item_list').append($("<option></option>"));
+                            $.each(result, function (index, item) {
+                                $('#select_item_list').append($('<option></option>').val(item.id).html(item.name));
+                            });
+
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                data: {
+                                    userId: id
+                                },
+                                url: "/NewRole/GetMyRoles",
+                                success: function (res) {
+                                    $('#assignRoleModal #select_item_list').select2({
+                                        placeholder: 'Select Roles',
+                                        dropdownParent: $('#assignRoleModal'),
+                                        tags: true
+                                    });
+                                    if (res) {
+                                        var roleMappedList = res.map(a => a.id);
+                                        $("#select_item_list").val(roleMappedList).trigger('change');
+                                    } else {
+                                        console.log("No Roles found.");
+                                    }
+                                },
+                                error: function (error) {
+                                    $.unblockUI();
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+        });
+
+    </script>
+}
