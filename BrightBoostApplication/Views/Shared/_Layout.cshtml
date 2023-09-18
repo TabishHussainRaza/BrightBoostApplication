@@ -58,8 +58,8 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
                         {
-                            <li class="nav-item @(((controller.Equals("User") || controller.Equals("Role")) && action.Equals("Index")) ? "menu-is-opening menu-open" : "")">
-                                <a href="#" class="nav-link @(((controller.Equals("User") || controller.Equals("Role")) && action.Equals("Index")) ? "active" : "")">
+                            <li class="nav-item @(((new[] { "User", "Role", "Terms" }.Contains(controller)) && action.Equals("Index")) ? "menu-is-opening menu-open" : "")">
+                                <a href="#" class="nav-link @(((new[] { "User", "Role", "Terms" }.Contains(controller)) && action.Equals("Index")) ? "active" : "")">
                                     <i class="nav-icon fas fa-cog"></i>
                                     <p>Administration<i class="fas fa-angle-left right"></i></p>
                                 </a>
@@ -74,6 +74,12 @@
                                         <a href="@Url.Action("Index", "Role")" class="nav-link @((controller.Equals("Role") && action.Equals("Index")) ? "active" : "")">
                                             <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                             <p>Roles Management</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item ">
+                                        <a href="@Url.Action("Index", "Terms")" class="nav-link @((controller.Equals("Terms") && action.Equals("Index")) ? "active" : "")">
+                                            <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                            <p>Terms Management</p>
                                         </a>
                                     </li>
                                 </ul>
