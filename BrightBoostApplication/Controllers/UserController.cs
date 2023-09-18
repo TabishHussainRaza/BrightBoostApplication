@@ -5,9 +5,11 @@ using BrightBoostApplication.Models;
 using BrightBoostApplication.BLL;
 using AutoMapper;
 using BrightBoostApplication.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Identity.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly User User;

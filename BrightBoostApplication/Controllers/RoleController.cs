@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using BrightBoostApplication.Models;
 using BrightBoostApplication.BLL;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Identity.Controllers
 {
+    [Authorize]
     public class RoleController : Controller
     {
         private Role Role;
