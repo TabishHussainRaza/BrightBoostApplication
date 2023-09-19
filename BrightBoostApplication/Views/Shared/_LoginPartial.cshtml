@@ -10,7 +10,7 @@
             <i class="fa fa-user-circle img-profile rounded-circle" aria-hidden="true"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li>
+            @*<li>
                 <a href="@Url.Action("Index", "Manage")" class="dropdown-item">
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     <span>
@@ -18,7 +18,7 @@
                     </span>
                 </a>
             </li>
-            <li><hr class="dropdown-divider"></li>
+        <li><hr class="dropdown-divider"></li>*@
             <li>
                 <form asp-area="Identity" class="dropdown-item" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button type="submit" class=" nav-link btn btn-link text-dark" style="padding-top: 0;padding-bottom: 0px; height: 25px;">
