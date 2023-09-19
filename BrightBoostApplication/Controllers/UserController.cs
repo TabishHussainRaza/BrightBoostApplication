@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using BrightBoostApplication.Models;
-using BrightBoostApplication.BLL;
 using AutoMapper;
 using BrightBoostApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -12,11 +11,11 @@ namespace Identity.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        private readonly User User;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public UserController(UserManager<ApplicationUser> userManager)
         {
-            User = new User(userManager);
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -26,23 +25,48 @@ namespace Identity.Controllers
 
         public JsonResult GetAllUsers()
         {
-            return Json(User.GetAllUsers());
+            return Json(_userManager.Users.ToList());
         }
 
         [HttpPost]
-        public JsonResult Add(CreateUserViewModel model)
+        public async Task<JsonResult> AddAsync(CreateUserViewModel model)
         {
-            var user = User.Add(model);
-            return Json(user.Result);
+            var user = new ApplicationUser
+            {
+                firstName = model.firstName,
+                lastName = model.lastName,
+                UserName = model.Email,
+                Email = model.Email,
+                isActive = true
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                return Json(true);
+            }
+            return Json(false);
         }
 
         [HttpPost]
-        public JsonResult Edit(EditUserViewModel model)
+        public async Task<JsonResult> EditAsync(EditUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = User.Edit(model);
-                return Json(user.Result);
+                var user = await _userManager.FindByIdAsync(model.id);
+                if (user != null)
+                {
+                    user.UserName = model.email;
+                    user.Email = model.email;
+                    user.firstName = model.firstName;
+                    user.lastName = model.lastName;
+                    user.isActive = model.isActive;
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return Json(true);
+                    }
+                }
+                return Json(false);
             }
             return Json(false);
         }
@@ -50,15 +74,35 @@ namespace Identity.Controllers
         [HttpDelete]
         public async Task<JsonResult> Delete(string id)
         {
-            var user = await User.Delete(id);
-            return Json(user);
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    return Json(true);
+                }
+            }
+            return Json(false);
         }
 
         [HttpPost]
         public async Task<JsonResult> ChangeUserStatus(EditUserViewModel model)
         {
-            var user = await User.ChangeUserStatus(model);
-            return Json(user);
+            if (model.isActive != null && model.id != null)
+            {
+                var user = await _userManager.FindByIdAsync(model.id);
+                if (user != null)
+                {
+                    user.isActive = model.isActive;
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return Json(true);
+                    }
+                }
+            }
+            return Json(false);
         }
 
     }

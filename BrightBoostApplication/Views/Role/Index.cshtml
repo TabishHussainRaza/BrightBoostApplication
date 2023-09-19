@@ -146,9 +146,6 @@
                                 var text = '<div style="display:flex; justify-content:space-around">';
                                 text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}" data-name="${row.name}">
                                             <span class="icon text-white-50" data-id="${row.id}" data-name="${row.name}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}" data-name="${row.name}"></i></span>
-                                        </a>
-                                        <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
-                                            <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
                                         </a>`;
                                 text += '</div>'
                                 return text;
@@ -303,7 +300,7 @@
                                     $('#EditRoleModal').modal('hide');
                                     swal({
                                         title: 'Role Updated!',
-                                        text: 'Successfully Created!',
+                                        text: 'Successfully Updated!',
                                         option: "success",
                                         icon: "success",
                                         timer: 3000
