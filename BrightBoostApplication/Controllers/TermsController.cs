@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BrightBoostApplication.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Administrator")]
     public class TermsController : Controller
     {
         private readonly ApplicationDbContext _context;
