@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BrightBoostApplication.Data;
 using BrightBoostApplication.Models;
-using BrightBoostApplication.BLL;
 using BrightBoostApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 

@@ -209,9 +209,6 @@
                                 
                                 <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
                                              <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
-                                                </a>
-                                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
-                                                    <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
                                                 </a>`;
                                 text += '</div>'
                                 return text;
@@ -547,7 +544,7 @@
                                 data: {
                                     userId: id
                                 },
-                                url: "/NewRole/GetMyRoles",
+                                url: "/Role/GetMyUserRoles",
                                 success: function (res) {
                                     $('#assignRoleModal #select_item_list').select2({
                                         placeholder: 'Select Roles',

@@ -14,10 +14,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<SignInManager<ApplicationUser>, CustomSignInManager>();
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = true;
-})
+builder.Services.AddDefaultIdentity<ApplicationUser>()
 .AddRoles<IdentityRole>()
 .AddSignInManager<CustomSignInManager>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
