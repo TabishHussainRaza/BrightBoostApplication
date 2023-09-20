@@ -2,6 +2,12 @@
 {
     public class Session
     {
+        public Session()
+        {
+            TermCourse = new TermCourse();
+            TutorAllocation = new List<TutorAllocation>();
+            StudentSignUp = new List<StudentSignUp>();
+        }
         public int Id { get; set; }
         public string SessionName { get; set; }
         public string SessionDay { get; set; }

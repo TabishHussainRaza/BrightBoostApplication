@@ -1,0 +1,364 @@
+﻿@{
+    ViewBag.Title = "Sessions Management";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">Sessions Manager</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="sessions" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br />
+
+<div class="modal fade" id="addNewSessionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Add Session</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="session_name"><b>Session Name </b></label>
+                        <input type="text" id="session_name" class="form-control" name="session_name" style="width:100%" />
+                        <span id="session_empty_error" class="text-danger small" style="display:none">Session Name Required</span>
+                        <br />
+                        <label class="label" for="session_day"><b>Session Day </b></label>
+                        <input type="text" id="session_day" class="form-control" name="session_day" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session Day Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_venue"><b>Session Venue </b></label>
+                        <input type="text" id="session_venue" class="form-control" name="session_venue" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session Venue Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_start_time"><b>Session StartTime </b></label>
+                        <input type="date" id="session_start_time" class="form-control" name="session_start_time" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session StartTime Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_end_time"><b>Session EndTime </b></label>
+                        <input type="date" id="session_end_time" class="form-control" name="session_end_time" style="width:100%" />
+                        <span id="session_empty_error" class="text-danger small" style="display:none">Session EndTime Required</span>
+                        <input type="text" id="session_id" class="form-control" name="session_id" style="display:none" />
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary addItem" id="btnSaveitem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EditSessionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Edit Session</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="session_edit_name"><b>Session Name </b></label>
+                        <input type="text" id="session_edit_name" class="form-control" name="session_edit_name" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session Name Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_edit_day"><b>Session Day </b></label>
+                        <input type="text" id="session_edit_day" class="form-control" name="session_edit_day" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session Day Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_edit_venue"><b>Session Venue </b></label>
+                        <input type="text" id="session_edit_venue" class="form-control" name="session_edit_venue" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session Venue Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_edit_start_time"><b>Session StartTime </b></label>
+                        <input type="date" id="session_edit_start_time" class="form-control" name="session_edit_start_time" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session StartTime Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                        <label class="label" for="session_edit_end_time"><b>Session EndTime </b></label>
+                        <input type="date" id="session_edit_end_time" class="form-control" name="session_edit_end_time" style="width:100%" />
+                        <span id="session_empty_edit_error" class="text-danger small" style="display:none">Session EndTime Required</span>
+                        <input type="text" id="session_edit_id" class="form-control" name="session_edit_id" style="display:none" />
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary updateItem" id="updateSessionItem">Update</a>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var sessionsDataTable = null;
+
+            function getAllSessions() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/Sessions/GetAllSessions",
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+
+                            if (sessionsDataTable == null) {
+                                initializeDataTable(result);
+                            } else {
+                                updateDataTable(result);
+                            }
+
+                        } else {
+                            console.log("No sessions found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateDataTable(updatedData) {
+                sessionsDataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeDataTable(data) {
+                sessionsDataTable = $('#sessions').DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Name',
+                            data: 'name'
+                        },
+                        {
+                            title: 'User Count',
+                            data: 'userCount'
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}" data-name="${row.name}">
+                                                    <span class="icon text-white-50" data-id="${row.id}" data-name="${row.name}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}" data-name="${row.name}"></i></span>
+                                                </a>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+
+            getAllSessions();
+
+            $('#addNew').on('click', function (e) {
+                $('#addNewSessionModal').modal('show');
+                $('#addNewSessionModal').on('hidden.bs.modal', function () {
+                    $('#session_name').val('');
+                    $('#session_empty_error').css("display", "none");
+                });
+                $('#btnSaveitem').on('click', function (e) {
+                    var data = {
+                        SessionName: $('#session_name').val(),
+                        SessionDay: $('#session_day').val(),
+                        SessionVenue: $('#session_venue').val(),
+                        startTime: $('#session_start_time').val(),
+                        endTime: $('#session_end_time').val()
+                    };
+
+                    if (data.SessionName == null || data.SessionName == "") {
+                        $('#session_empty_error').css("display", "block");
+                        return;
+                    } else {
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            url: "/Sessions/Create",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result) {
+                                    $('#session_name').val();
+                                    $('#addNewSessionModal').modal('hide');
+                                    swal({
+                                        title: 'Session Added!',
+                                        text: 'Successfully Created!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllSessions();
+                                } else {
+                                    swal({
+                                        title: 'Session Addition Failed!',
+                                        text: 'Could Not be Added!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            $("#sessions").on("click", ".js-delete", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to delete the session!",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "DELETE",
+                            data: data,
+                            url: "/Sessions/DeleteRole",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'Session Deleted!',
+                                        text: 'Successfully Deleted!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllSession();
+                                } else {
+                                    swal({
+                                        title: 'Session Deletion Failed!',
+                                        text: 'Could Not be Deleted!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "Session Not deleted", "error");
+                    }
+                })
+            });
+
+            $("#sessions").on("click", ".js-update", function (e) {
+
+                var prev = $(e.target).data('name');
+                var data = {
+                    id: $(e.target).data('id'),
+                    name: $(e.target).data('name'),
+                };
+                $('#session_edit_name').val(data.name);
+                $('#session_edit_id').val(data.id);
+                $('#EditSessionModal').modal('show');
+
+                $('#EditSessionModal').on('hidden.bs.modal', function () {
+                    $('#session_edit_name').val('');
+                    $('#session_edit_id').val('');
+                    $('#session_empty_edit_error').css("display", "none");
+                });
+
+                $('#updateSessionItem').on('click', function (e) {
+                    data.name = $('#session_edit_name').val();
+                    if (data.name == null || data.name == "") {
+                        $('#session_empty_edit_error').css("display", "block");
+                        return;
+                    } else {
+                        if (prev == data.name) {
+                            $('#EditSessionModal').modal('hide');
+                            swal({
+                                title: 'Session Not Updated!',
+                                text: 'Name not changed!',
+                                option: "warning",
+                                icon: "warning",
+                                timer: 3000
+                            });
+                            return;
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            url: "/Sessions/UpdateSession",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result) {
+                                    $('#session_edit_name').val();
+                                    $('#session_edit_id').val();
+                                    $('#EditSessionModal').modal('hide');
+                                    swal({
+                                        title: 'Session Updated!',
+                                        text: 'Successfully Updated!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllSession();
+                                } else {
+                                    console.log("no");
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>
+}
