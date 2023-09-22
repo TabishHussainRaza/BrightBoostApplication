@@ -1,12 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Subjects Management";
-    ViewBag.description = "Subject";
+    ViewBag.Title = "Terms Management";
 }
 
 <div class="card">
     <div class="card-header">
         <div class="d-flex align-items-center">
-            <h3 class="mr-auto">@ViewBag.description Management</h3>
+            <h3 class="mr-auto">Terms Management</h3>
             <div class="btn-group" role="group">
                 <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
             </div>
@@ -17,7 +16,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="table-responsive">
-                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                        <table id="terms" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
                     </div>
                 </div>
             </div>
@@ -34,7 +33,7 @@
                 <table style="width: 100%">
                     <tr>
                         <td style="width: 100%">
-                            <h4 class="modal-title" id="myModalLabel">Add @ViewBag.description</h4>
+                            <h4 class="modal-title" id="myModalLabel">Add Term</h4>
                         </td>
                     </tr>
                 </table>
@@ -43,17 +42,25 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <label class="label" for="subject_name"><b>Subject Name</b></label>
-                        <input type="text" id="subject_name" class="form-control" name="subject_name" style="width:100%" />
-                        <span id="subject_name_error" class="text-danger small" style="display:none">Subject Name Required</span>
+                        <label class="label" for="term_name"><b>Term Name </b></label>
+                        <input type="text" id="term_name" class="form-control" name="term_name" style="width:100%" />
+                        <span id="term_empty_error" class="text-danger small" style="display:none">Term Name Required</span>
                         <br />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <label class="label" for="subject_description"><b>Subject Description</b></label>
-                        <textarea id="subject_description" class="form-control" name="subject_description" style="width:100%"></textarea>
-                        <span id="subject_description_error" class="text-danger small" style="display:none">Subject Description Required</span>
+                        <label class="label" for="start_date"><b>Start Date </b></label>
+                        <input type="date" id="start_date" class="form-control" name="start_date" style="width:100%" />
+                        <span id="sd_empty_error" class="text-danger small" style="display:none">Start Date Required</span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="end_date"><b>End Date </b></label>
+                        <input type="date" id="end_date" class="form-control" name="end_date" style="width:100%" />
+                        <span id="ed_empty_error" class="text-danger small" style="display:none">End Date Required</span>
                         <br />
                     </div>
                 </div>
@@ -71,24 +78,32 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="editModalLabel">Edit @ViewBag.description</h4>
+                <h4 class="modal-title" id="editModalLabel">Edit Term</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="edit_Id" class="form-control" style="width: 100%" name="Id" />
+                <input type="hidden" id="edit_term_Id" class="form-control" style="width: 100%" name="Id" />
                 <div class="row">
                     <div class="col-md-12">
-                        <label class="label" for="subject_name_edit"><b>Subject Name</b></label>
-                        <input type="text" id="subject_name_edit" class="form-control" name="subject_name_edit" style="width:100%" />
-                        <span id="subject_name_error_edit" class="text-danger small" style="display:none">Subject Name Required</span>
+                        <label class="label" for="edit_term_name"><b>Term Name </b></label>
+                        <input type="text" id="edit_term_name" class="form-control" style="width: 100%" name="TermName" />
+                        <span id="edit_term_empty_error" class="text-danger small" style="display:none">Term Name Required</span>
                         <br />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <label class="label" for="subject_description_edit"><b>Subject Description</b></label>
-                        <textarea id="subject_description_edit" class="form-control" name="subject_description_edit" style="width:100%"></textarea>
-                        <span id="subject_description_error_edit" class="text-danger small" style="display:none">Subject Description Required</span>
+                        <label class="label" for="edit_start_date"><b>Start Date </b></label>
+                        <input type="date" id="edit_start_date" class="form-control" style="width: 100%" name="StartDate" />
+                        <span id="edit_sd_empty_error" class="text-danger small" style="display:none">Start Date Required</span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="edit_end_date"><b>End Date </b></label>
+                        <input type="date" id="edit_end_date" class="form-control" style="width: 100%" name="EndDate" />
+                        <span id="edit_ed_empty_error" class="text-danger small" style="display:none">End Date Required</span>
                         <br />
                     </div>
                 </div>
@@ -100,6 +115,7 @@
         </div>
     </div>
 </div>
+
 
 <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
 @section scripts
@@ -115,7 +131,7 @@
                 $.blockUI({ message: '<p>Loading..</p>' });
                 $.ajax({
                     type: "GET",
-                    url: "/Subjects/GetAllSubjects",
+                    url: "/Terms/GetAllTerms",
                     success: function (result) {
                         $.unblockUI();
                         if (result) {
@@ -139,28 +155,36 @@
             }
 
             function initializeDataTable(data) {
-                DataTable = $(`#@ViewBag.description`).DataTable({
+                DataTable = $('#terms').DataTable({
                     data: data,
                     columns: [
                         {
-                            title: 'Subject name',
-                            data: 'subjectName'
+                            title: 'Term name',
+                            data: 'termName'
                         },
                         {
-                            title: 'Subject Description',
-                            data: 'subjectDescription'
+                            title: 'Start Date',
+                            render: function (data, type, row, meta) {
+                                return row.startDate != null ? new Date(row.startDate).toLocaleDateString() : "";
+                            }
 
+                        },
+                        {
+                            title: 'End Date',
+                            render: function (data, type, row, meta) {
+                                return row.endDate != null ? new Date(row.endDate).toLocaleDateString() : "";
+                            }
                         },
                         {
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
-                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row?.id}">
-                                                                                                            <span class="icon text-white-50" data-id="${row?.id}"><i class='fa fa-pencil' style='color: white' data-id="${row?.id}"></i></span>
-                                                        </a>
-                                                                        <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row?.id}">
-                                                                                            <span class="icon text-white-50"  data-id="${row?.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row?.id}"></i></span>
-                                                        </a>`;
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
+                                                                                                    <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
+                                                </a>
+                                                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
+                                                                                    <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
+                                                </a>`;
                                 text += '</div>'
                                 return text;
                             }
@@ -172,57 +196,70 @@
             getAll();
 
             function validateForm() {
-                var subject_name = $('#subject_name').val();
-                var subject_description = $('#subject_description').val();
-                var result = true;
+                var termName = $("#term_name").val();
+                var startDate = $("#start_date").val();
+                var endDate = $("#end_date").val();
+                var isValid = true;
 
-                if (subject_name.trim() === "") {
-                    $('#subject_name_error').css("display", "block");
-                    result = false;
+                // Check if Term Name is empty
+                if (termName === "") {
+                    $("#term_empty_error").show();
+                    isValid = false;
                 } else {
-                    $('#subject_name_error').css("display", "none");
+                    $("#term_empty_error").hide();
                 }
 
-                if (subject_description.trim() === "") {
-                    $('#subject_description_error').css("display", "block");
-                    result = false;
+                // Check if Start Date is empty
+                if (startDate === "") {
+                    $("#sd_empty_error").show();
+                    isValid = false;
                 } else {
-                    $('#subject_description_error').css("display", "none");
+                    $("#sd_empty_error").hide();
                 }
 
-                return result;
+                // Check if End Date is empty
+                if (endDate === "") {
+                    $("#ed_empty_error").show();
+                    isValid = false;
+                } else {
+                    $("#ed_empty_error").hide();
+                }
+
+                return isValid;
             }
 
             $('#addNew').on('click', function (e) {
                 $('#addNewModal').modal('show');
                 $('#addNewModal').on('hidden.bs.modal', function () {
-                    $('#subject_name').val('');
-                    $('#subject_name_error').css("display", "none");
+                    $('#term_name').val('');
+                    $('#term_empty_error').css("display", "none");
 
-                    $('#subject_description').val('');
-                    $('#subject_description_error').css("display", "none");
+                    $('#start_date').val('');
+                    $('#end_date').val('');
+                    $('#sd_empty_error').css("display", "none");
+                    $('#ed_empty_error').css("display", "none");
                 });
 
                 $('#btnSaveitem').on('click', function (e) {
                     if (!validateForm()) {
                         return;
                     } else {
-                        var data = {
-                            name: $("#subject_name").val(),
-                            description: $("#subject_description").val(),
+                        var data  = {
+                            termName: $("#term_name").val(),
+                            startDate: $("#start_date").val(),
+                            endDate: $("#end_date").val()
                         };
-
                         $.ajax({
                             type: "POST",
                             data: data,
-                            url: "/Subjects/CreateSubject",
+                            url: "/Terms/Create",
                             dataType: "json",
                             success: function (result) {
                                 if (result) {
                                     $('#term_name').val();
                                     $('#addNewModal').modal('hide');
                                     swal({
-                                        title: 'Subject Added!',
+                                        title: 'Term Added!',
                                         text: 'Successfully Created!',
                                         option: "success",
                                         icon: "success",
@@ -231,7 +268,7 @@
                                     getAll();
                                 } else {
                                     swal({
-                                        title: 'Subject Addition Failed!',
+                                        title: 'Term Addition Failed!',
                                         text: 'Could Not be Added!',
                                         option: "error",
                                         icon: "error",
@@ -242,18 +279,24 @@
                         });
                     }
                 });
-
             });
 
             function populateEditModal(id) {
                 $.ajax({
-                    url: "/Subjects/Details/" + id,
+                    url: "/Terms/Details/" + id, 
                     type: "GET",
                     success: function (data) {
                         if (data) {
-                            $("#edit_Id").val(id);
-                            $("#subject_name_edit").val(data.subjectName);
-                            $("#subject_description_edit").val(data.subjectName);
+                            $("#edit_term_Id").val(id);
+                            $("#edit_term_name").val(data.termName);
+
+                            var startDate = new Date(data.startDate);
+                            var endDate = new Date(data.endDate);
+
+                            // Set the date input values
+                            $("#edit_start_date").val(startDate.toISOString().split('T')[0]);
+                            $("#edit_end_date").val(endDate.toISOString().split('T')[0]);
+
                             $("#editModal").modal("show");
                         } else {
                             swal({
@@ -277,14 +320,14 @@
                 });
             }
 
-            $(`#Subject`).on("click", ".js-update", function (e) {
-                var Id = $(this).data("id");
-                populateEditModal(Id);
+            $("#terms").on("click", ".js-update", function (e) {
+                var termId = $(this).data("id");
+                populateEditModal(termId);
             });
 
-            function update(updatedData) {
+            function updateTerm(updatedData) {
                 $.ajax({
-                    url: "/Subjects/UpdateSubject",
+                    url: "/Terms/Update",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(updatedData),
@@ -293,7 +336,7 @@
                             // Term updated successfully, close the edit modal
                             $("#editModal").modal("hide");
                             swal({
-                                title: 'Subject Updated!',
+                                title: 'Term Updated!',
                                 text: 'Successfully Updated!',
                                 option: "success",
                                 icon: "success",
@@ -302,7 +345,7 @@
                             getAll();
                         } else {
                             swal({
-                                title: 'Subject Update Failed!',
+                                title: 'Term Update Failed!',
                                 text: 'Could Not be Updated!',
                                 option: "error",
                                 icon: "error",
@@ -312,7 +355,7 @@
                     },
                     error: function () {
                         swal({
-                            title: 'Subject Update Failed!',
+                            title: 'Term Update Failed!',
                             text: 'Could Not be Updated!',
                             option: "error",
                             icon: "error",
@@ -325,20 +368,21 @@
             // Handle Save Changes button click in the Edit Modal
             $("#btnSaveEdit").click(function () {
                 var updatedData = {
-                    Id: parseInt($("#edit_Id").val(), 10),
-                    SubjectName: $("#subject_name_edit").val(),
-                    SubjectDescription: $("#subject_description_edit").val()
+                    Id: parseInt($("#edit_term_Id").val(), 10),
+                    TermName: $("#edit_term_name").val(),
+                    StartDate: $("#edit_start_date").val(),
+                    EndDate: $("#edit_end_date").val()
                 };
-                update(updatedData);
+                updateTerm(updatedData);
             });
 
-            $("#Subject").on("click", ".js-delete", function (e) {
+            $("#terms").on("click", ".js-delete", function (e) {
                 var data = {
                     id: $(e.target).data('id')
                 };
                 swal({
                     title: "Comfirmation",
-                    text: "Are you sure you want to delete the @ViewBag.description!",
+                    text: "Are you sure you want to delete the Term!",
                     icon: "warning",
                     buttons: [
                         'No',
@@ -351,13 +395,13 @@
                         $.ajax({
                             type: "DELETE",
                             data: data,
-                            url: "/Subjects/DeleteSubject",
+                            url: "/Terms/DeleteTerm",
                             dataType: "json",
                             success: function (result) {
                                 $.unblockUI();
                                 if (result) {
                                     swal({
-                                        title: 'Subject Deleted!',
+                                        title: 'Term Deleted!',
                                         text: 'Successfully Deleted!',
                                         option: "success",
                                         icon: "success",
@@ -366,7 +410,7 @@
                                     getAll();
                                 } else {
                                     swal({
-                                        title: 'Subject Deletion Failed!',
+                                        title: 'Term Deletion Failed!',
                                         text: 'Could Not be Deleted!',
                                         option: "error",
                                         icon: "error",
@@ -376,7 +420,7 @@
                             }
                         });
                     } else {
-                        swal("Cancelled", "Subject Not deleted", "error");
+                        swal("Cancelled", "Term Not deleted", "error");
                     }
                 })
             });
