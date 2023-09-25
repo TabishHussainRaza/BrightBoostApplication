@@ -34,7 +34,7 @@ namespace BrightBoostApplication.Controllers
         public async Task<JsonResult> GetAllSubjects()
         {
             var subjects = new List<Subject>();
-            if (_context.Terms != null)
+            if (_context.Subjects != null)
             {
                 subjects = await _context.Subjects.Where(i => i.isActive == true).ToListAsync();
             }
