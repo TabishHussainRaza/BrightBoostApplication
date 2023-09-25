@@ -9,6 +9,8 @@ using BrightBoostApplication.Data;
 using BrightBoostApplication.Models;
 using BrightBoostApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using ServiceStack;
 
 namespace BrightBoostApplication.Controllers
 {
@@ -130,5 +132,19 @@ namespace BrightBoostApplication.Controllers
             await _context.SaveChangesAsync();
             return Json(true);
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetMySubjects(int id)
+        {
+            if (_context.TermCourses != null)
+            {
+                var subjects = await _context.TermCourses.Where(i => i.TermId == id).ToListAsync();
+                return Json(subjects);
+            }
+            return Json(null);
+        }
+
+        
+
     }
 }

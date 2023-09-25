@@ -1,0 +1,386 @@
+﻿@{
+    ViewBag.Title = "Subjects Management";
+    ViewBag.description = "Subject";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">@ViewBag.description Management</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<br />
+
+<div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Add @ViewBag.description</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="subject_name"><b>Subject Name</b></label>
+                        <input type="text" id="subject_name" class="form-control" name="subject_name" style="width:100%" />
+                        <span id="subject_name_error" class="text-danger small" style="display:none">Subject Name Required</span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="subject_description"><b>Subject Description</b></label>
+                        <textarea id="subject_description" class="form-control" name="subject_description" style="width:100%"></textarea>
+                        <span id="subject_description_error" class="text-danger small" style="display:none">Subject Description Required</span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary addItem" id="btnSaveitem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="editModalLabel">Edit @ViewBag.description</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit_Id" class="form-control" style="width: 100%" name="Id" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="subject_name_edit"><b>Subject Name</b></label>
+                        <input type="text" id="subject_name_edit" class="form-control" name="subject_name_edit" style="width:100%" />
+                        <span id="subject_name_error_edit" class="text-danger small" style="display:none">Subject Name Required</span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="subject_description_edit"><b>Subject Description</b></label>
+                        <textarea id="subject_description_edit" class="form-control" name="subject_description_edit" style="width:100%"></textarea>
+                        <span id="subject_description_error_edit" class="text-danger small" style="display:none">Subject Description Required</span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary" id="btnSaveEdit">Save Changes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var DataTable = null;
+
+            function getAll() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/Subjects/GetAllSubjects",
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+                            if (DataTable == null) {
+                                initializeDataTable(result);
+                            } else {
+                                updateDataTable(result);
+                            }
+                        } else {
+                            console.log("No Items found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateDataTable(updatedData) {
+                DataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeDataTable(data) {
+                DataTable = $(`#@ViewBag.description`).DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Subject name',
+                            data: 'subjectName'
+                        },
+                        {
+                            title: 'Subject Description',
+                            data: 'subjectDescription'
+
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row?.id}">
+                                                                                                                    <span class="icon text-white-50" data-id="${row?.id}"><i class='fa fa-pencil' style='color: white' data-id="${row?.id}"></i></span>
+                                                                </a>
+                                                                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row?.id}">
+                                                                                                    <span class="icon text-white-50"  data-id="${row?.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row?.id}"></i></span>
+                                                                </a>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+
+            getAll();
+
+            function validateForm() {
+                var subject_name = $('#subject_name').val();
+                var subject_description = $('#subject_description').val();
+                var result = true;
+
+                if (subject_name.trim() === "") {
+                    $('#subject_name_error').css("display", "block");
+                    result = false;
+                } else {
+                    $('#subject_name_error').css("display", "none");
+                }
+
+                if (subject_description.trim() === "") {
+                    $('#subject_description_error').css("display", "block");
+                    result = false;
+                } else {
+                    $('#subject_description_error').css("display", "none");
+                }
+
+                return result;
+            }
+
+            $('#addNew').on('click', function (e) {
+                $('#addNewModal').modal('show');
+                $('#addNewModal').on('hidden.bs.modal', function () {
+                    $('#subject_name').val('');
+                    $('#subject_name_error').css("display", "none");
+
+                    $('#subject_description').val('');
+                    $('#subject_description_error').css("display", "none");
+                });
+
+                $('#btnSaveitem').on('click', function (e) {
+                    if (!validateForm()) {
+                        return;
+                    } else {
+                        var data = {
+                            name: $("#subject_name").val(),
+                            description: $("#subject_description").val(),
+                        };
+
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            url: "/Subjects/CreateSubject",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result) {
+                                    $('#term_name').val();
+                                    $('#addNewModal').modal('hide');
+                                    swal({
+                                        title: 'Subject Added!',
+                                        text: 'Successfully Created!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAll();
+                                } else {
+                                    swal({
+                                        title: 'Subject Addition Failed!',
+                                        text: 'Could Not be Added!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+
+            function populateEditModal(id) {
+                $.ajax({
+                    url: "/Subjects/Details/" + id,
+                    type: "GET",
+                    success: function (data) {
+                        if (data) {
+                            $("#edit_Id").val(id);
+                            $("#subject_name_edit").val(data.subjectName);
+                            $("#subject_description_edit").val(data.subjectName);
+                            $("#editModal").modal("show");
+                        } else {
+                            swal({
+                                title: 'No details found!',
+                                text: 'Could Not find details!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal({
+                            title: 'No details found!',
+                            text: 'Could Not find details!',
+                            option: "error",
+                            icon: "error",
+                            timer: 3000
+                        });
+                    }
+                });
+            }
+
+            $(`#Subject`).on("click", ".js-update", function (e) {
+                var Id = $(this).data("id");
+                populateEditModal(Id);
+            });
+
+            function update(updatedData) {
+                $.ajax({
+                    url: "/Subjects/UpdateSubject",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(updatedData),
+                    success: function (response) {
+                        if (response === true) {
+                            // Term updated successfully, close the edit modal
+                            $("#editModal").modal("hide");
+                            swal({
+                                title: 'Subject Updated!',
+                                text: 'Successfully Updated!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAll();
+                        } else {
+                            swal({
+                                title: 'Subject Update Failed!',
+                                text: 'Could Not be Updated!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal({
+                            title: 'Subject Update Failed!',
+                            text: 'Could Not be Updated!',
+                            option: "error",
+                            icon: "error",
+                            timer: 3000
+                        });
+                    }
+                });
+            }
+
+            // Handle Save Changes button click in the Edit Modal
+            $("#btnSaveEdit").click(function () {
+                var updatedData = {
+                    Id: parseInt($("#edit_Id").val(), 10),
+                    SubjectName: $("#subject_name_edit").val(),
+                    SubjectDescription: $("#subject_description_edit").val()
+                };
+                update(updatedData);
+            });
+
+            $("#Subject").on("click", ".js-delete", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to delete the @ViewBag.description!",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "DELETE",
+                            data: data,
+                            url: "/Subjects/DeleteSubject",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'Subject Deleted!',
+                                        text: 'Successfully Deleted!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAll();
+                                } else {
+                                    swal({
+                                        title: 'Subject Deletion Failed!',
+                                        text: 'Could Not be Deleted!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "Subject Not deleted", "error");
+                    }
+                })
+            });
+        });
+
+    </script>
+}

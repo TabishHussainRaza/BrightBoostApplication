@@ -78,6 +78,7 @@
                         <input type="text" id="role_edit_name" class="form-control" name="role_edit_name" style="width:100%" />
                         <span id="role_empty_edit_error" class="text-danger small" style="display:none">Role Name Required</span>
                         <input type="text" id="role_edit_id" class="form-control" name="role_edit_id" style="display:none" />
+                        <input type="hidden" id="prev_name" class="form-control" name="prev_name" />
                         <br />
                     </div>
                 </div>
@@ -163,16 +164,19 @@
                     $('#role_name').val('');
                     $('#role_empty_error').css("display", "none");
                 });
-                $('#btnSaveitem').on('click', function (e) {
-                    var data = {
-                        name: $('#role_name').val()
-                    };
+                
+            });
 
-                    if(data.name == null || data.name ==""){
-                        $('#role_empty_error').css("display", "block");
-                        return ;
-                    }else{
-                        $.ajax({
+            $('#btnSaveitem').on('click', function (e) {
+                var data = {
+                    name: $('#role_name').val()
+                };
+
+                if (data.name == null || data.name == "") {
+                    $('#role_empty_error').css("display", "block");
+                    return;
+                } else {
+                    $.ajax({
                         type: "POST",
                         data: data,
                         url: "/Role/Create",
@@ -200,8 +204,7 @@
                             }
                         }
                     });
-                    }
-                });
+                }
             });
 
             $("#roles").on("click", ".js-delete", function (e) {
@@ -254,8 +257,6 @@
             });
 
             $("#roles").on("click", ".js-update", function (e) {
-
-                var prev = $(e.target).data('name');
                 var data = {
                     id: $(e.target).data('id'),
                     name: $(e.target).data('name'),
@@ -263,6 +264,7 @@
                 $('#role_edit_name').val(data.name);
                 $('#role_edit_id').val(data.id);
                 $('#EditRoleModal').modal('show');
+                $('#prev_name').val($(e.target).data('name'));
 
                 $('#EditRoleModal').on('hidden.bs.modal', function () {
                     $('#role_edit_name').val('');
@@ -270,49 +272,53 @@
                     $('#role_empty_edit_error').css("display", "none");
                 });
 
-                $('#updateRoleItem').on('click', function (e) {
-                    data.name = $('#role_edit_name').val();
-                    if (data.name == null || data.name == "") {
-                        $('#role_empty_edit_error').css("display", "block");
-                        return;
-                    } else {
-                        if (prev == data.name){
-                            $('#EditRoleModal').modal('hide');
-                            swal({
-                                title: 'Role Not Updated!',
-                                text: 'Name not changed!',
-                                option: "warning",
-                                icon: "warning",
-                                timer: 3000
-                            });
-                            return;
-                        }
-                        
-                        $.ajax({
-                            type: "POST",
-                            data: data,
-                            url: "/Role/UpdateRole",
-                            dataType: "json",
-                            success: function (result) {
-                                if (result) {
-                                    $('#role_edit_name').val();
-                                    $('#role_edit_id').val();
-                                    $('#EditRoleModal').modal('hide');
-                                    swal({
-                                        title: 'Role Updated!',
-                                        text: 'Successfully Updated!',
-                                        option: "success",
-                                        icon: "success",
-                                        timer: 3000
-                                    });
-                                    getAllRoles();
-                                } else {
-                                    console.log("no");
-                                }
-                            }
+            });
+
+            $('#updateRoleItem').on('click', function (e) {
+                var data = {
+                    id: $('#role_edit_id').val(),
+                    name: $('#role_edit_name').val()
+                };
+                if (data.name == null || data.name == "") {
+                    $('#role_empty_edit_error').css("display", "block");
+                    return;
+                } else {
+                    if ($('#prev_name').val() == data.name) {
+                        $('#EditRoleModal').modal('hide');
+                        swal({
+                            title: 'Role Not Updated!',
+                            text: 'Name not changed!',
+                            option: "warning",
+                            icon: "warning",
+                            timer: 3000
                         });
+                        return;
                     }
-                });
+
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        url: "/Role/UpdateRole",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result) {
+                                $('#role_edit_name').val();
+                                $('#role_edit_id').val();
+                                $('#EditRoleModal').modal('hide');
+                                swal({
+                                    title: 'Role Updated!',
+                                    text: 'Successfully Updated!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAllRoles();
+                            } else {
+                                console.log("no");
+                            }
+                        }
+                    });
+                }
             });
         });
 

@@ -122,7 +122,7 @@
                     <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
                 </div>
 
-                <input type="hidden" class="form-control assignRole" id="assignRole" name="assignRole">
+                <input type="hidden" class="form-control assignRole" id="assignRoleId" name="assignRole">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -226,66 +226,68 @@
                     $(".addField").val("");
                     $(".text-danger").hide();   
                 });
-                $('#btnSaveitem').on('click', function (e) {
-                    $(".text-danger").css("display", "none");
+                
+            });
 
-                    // Check for empty fields
-                    var hasErrors = false;
-                    $(".addField").each(function () {
-                        if ($(this).val().trim() === "") {
-                            var fieldId = $(this).attr("id");
-                            $("#" + fieldId + "_empty_error").css("display", "block");
-                            hasErrors = true;
-                        }
-                    });
+            $('#btnSaveitem').on('click', function (e) {
+                $(".text-danger").css("display", "none");
 
-                    if (hasErrors) {
-                        return false;
-                    } else {
-                        var firstName = $("#first_name").val();
-                        var lastName = $("#last_name").val();
-                        var email = $("#email").val();
-                        var password = $("#password").val();
-
-                        var requestData = {
-                            firstName: firstName,
-                            lastName: lastName,
-                            email: email,
-                            password: password
-                        };
-
-                        $.ajax({
-                            url: '/User/Add', 
-                            type: 'POST',
-                            data: requestData,
-                            dataType: 'json',
-                            success: function (response) {
-                                if (response) {
-                                    $('#addNewUserModal').modal('hide');
-                                    swal({
-                                        title: 'User Added!',
-                                        text: 'Successfully Created!',
-                                        option: "success",
-                                        icon: "success",
-                                        timer: 3000
-                                    });
-                                    getAllUsers();
-                                } else {
-                                    swal({
-                                        title: 'User Addition Failed!',
-                                        text: 'Could Not be Added!',
-                                        option: "error",
-                                        icon: "error",
-                                        timer: 3000
-                                    });
-                                }
-                            },
-                            error: function (error) {
-                                swal("Cancelled", "User Not deleted", "error");
-                            }
-                        });
+                // Check for empty fields
+                var hasErrors = false;
+                $(".addField").each(function () {
+                    if ($(this).val().trim() === "") {
+                        var fieldId = $(this).attr("id");
+                        $("#" + fieldId + "_empty_error").css("display", "block");
+                        hasErrors = true;
                     }
                 });
+
+                if (hasErrors) {
+                    return false;
+                } else {
+                    var firstName = $("#first_name").val();
+                    var lastName = $("#last_name").val();
+                    var email = $("#email").val();
+                    var password = $("#password").val();
+
+                    var requestData = {
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        password: password
+                    };
+
+                    $.ajax({
+                        url: '/User/Add',
+                        type: 'POST',
+                        data: requestData,
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response) {
+                                $('#addNewUserModal').modal('hide');
+                                swal({
+                                    title: 'User Added!',
+                                    text: 'Successfully Created!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAllUsers();
+                            } else {
+                                swal({
+                                    title: 'User Addition Failed!',
+                                    text: 'Could Not be Added!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            swal("Cancelled", "User Not deleted", "error");
+                        }
+                    });
+                }
             });
 
             function findUserById(userId) {
@@ -313,63 +315,62 @@
                         $(".editField").val("");
                         $(".text-danger").hide();
                     });
+                }    
+            });
 
-                    $('#btnEditUser').on('click', function (e) {
-                        $(".text-danger").css("display", "none");
+            $('#btnEditUser').on('click', function (e) {
+                $(".text-danger").css("display", "none");
 
-                        var hasErrors = false;
-                        $(".editField").each(function () {
-                            if ($(this).val().trim() === "") {
-                                var fieldId = $(this).attr("id");
-                                $("#" + fieldId + "_empty_error").css("display", "block");
-                                hasErrors = true;
+                var hasErrors = false;
+                $(".editField").each(function () {
+                    if ($(this).val().trim() === "") {
+                        var fieldId = $(this).attr("id");
+                        $("#" + fieldId + "_empty_error").css("display", "block");
+                        hasErrors = true;
+                    }
+                });
+
+                if (hasErrors) {
+                    return false;
+                } else {
+                    var editedData = {
+                        firstName: $("#edit_first_name").val(),
+                        lastName: $("#edit_last_name").val(),
+                        email: $("#edit_email").val(),
+                        id: $("#edit_id").val()
+                    };
+
+                    $.ajax({
+                        url: '/User/Edit',
+                        type: 'POST',
+                        data: editedData,
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response) {
+                                $('#editUserModal').modal('hide');
+                                swal({
+                                    title: 'User Edited!',
+                                    text: 'User information successfully updated!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAllUsers();
+                            } else {
+                                swal({
+                                    title: 'Edit Failed!',
+                                    text: 'User information could not be updated!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
                             }
-                        });
-
-                        if (hasErrors) {
-                            return false;
-                        } else {
-                            var editedData = {
-                                firstName: $("#edit_first_name").val(),
-                                lastName: $("#edit_last_name").val(),
-                                email: $("#edit_email").val(),
-                                id: $("#edit_id").val()
-                            };
-
-                            $.ajax({
-                                url: '/User/Edit',
-                                type: 'POST',
-                                data: editedData,
-                                dataType: 'json',
-                                success: function (response) {
-                                    if (response) {
-                                        $('#editUserModal').modal('hide');
-                                        swal({
-                                            title: 'User Edited!',
-                                            text: 'User information successfully updated!',
-                                            option: "success",
-                                            icon: "success",
-                                            timer: 3000
-                                        });
-                                        getAllUsers();
-                                    } else {
-                                        swal({
-                                            title: 'Edit Failed!',
-                                            text: 'User information could not be updated!',
-                                            option: "error",
-                                            icon: "error",
-                                            timer: 3000
-                                        });
-                                    }
-                                },
-                                error: function (error) {
-                                    swal("Error", "An error occurred while editing the user.", "error");
-                                }
-                            });
+                        },
+                        error: function (error) {
+                            swal("Error", "An error occurred while editing the user.", "error");
                         }
                     });
                 }
-                
             });
 
             $("#user").on("click", ".js-delete", function (e) {
@@ -477,53 +478,54 @@
                 };
                 $('#assignRoleModal').modal('show');
                 loadOptionItems(data.id);
-                $('#btnAssignRole').on('click', function (e) {
-                    var roleIds = $("#select_item_list").val();
 
-                    var requestData = {
-                        userId: data.id
-                    };
+                $("#assignRoleId").val(data.id);
+            });
 
-                    if (roleIds && roleIds.length > 0) {
-                        requestData.RoleIds = roleIds;
-                        requestData.RoleName = $("#select_item_list").text();
-                    } else {
-                        requestData.removeAll = true;
-                    }
+            $('#btnAssignRole').on('click', function (e) {
+                var roleIds = $("#select_item_list").val();
+                var requestData = {
+                    userId:  $("#assignRoleId").val()
+                };
 
-                    $.ajax({
-                        url: "/Role/AddRoleMapping",
-                        type: "POST",
-                        data: requestData,
-                        dataType: "json",
-                        success: function (data) {
-                            $('#assignRoleModal').modal('hide');
-                            if(data){
-                                swal({
-                                    title: 'User Role(s) Updated!',
-                                    text: 'Successfully Updated!',
-                                    option: "success",
-                                    icon: "success",
-                                    timer: 3000
-                                });
-                                getAllUsers();
-                            } else {
-                                swal({
-                                    title: 'User Role(s) Change Failed!',
-                                    text: 'Could Not be Changed!',
-                                    option: "error",
-                                    icon: "error",
-                                    timer: 3000
-                                });
-                            }
-                        },
-                        error: function (xhr, status, error) {
+                if (roleIds && roleIds.length > 0) {
+                    requestData.RoleIds = roleIds;
+                    requestData.RoleName = $("#select_item_list").text();
+                } else {
+                    requestData.removeAll = true;
+                }
 
-                            console.error("Error:", status, error);
-                        },
-                    });
+                $.ajax({
+                    url: "/Role/AddRoleMapping",
+                    type: "POST",
+                    data: requestData,
+                    dataType: "json",
+                    success: function (data) {
+                        $('#assignRoleModal').modal('hide');
+                        if (data) {
+                            swal({
+                                title: 'User Role(s) Updated!',
+                                text: 'Successfully Updated!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAllUsers();
+                        } else {
+                            swal({
+                                title: 'User Role(s) Change Failed!',
+                                text: 'Could Not be Changed!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.error("Error:", status, error);
+                    },
                 });
-
             });
 
             function loadOptionItems(id) {
