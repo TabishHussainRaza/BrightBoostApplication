@@ -316,12 +316,9 @@
                             $("#edit_term_Id").val(id);
                             $("#edit_term_name").val(data.termName);
 
-                            var startDate = new Date(data.startDate);
-                            var endDate = new Date(data.endDate);
-
                             // Set the date input values
-                            $("#edit_start_date").val(startDate.toISOString().split('T')[0]);
-                            $("#edit_end_date").val(endDate.toISOString().split('T')[0]);
+                            $("#edit_start_date").val(data.startDate.split('T')[0]);
+                            $("#edit_end_date").val(data.endDate.split('T')[0]);
 
                             $("#editModal").modal("show");
                         } else {
