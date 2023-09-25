@@ -115,13 +115,35 @@
         </div>
     </div>
 </div>
-
-
+<div class="modal fade" id="assignModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Subjects</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Subjects</label>
+                    <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
+                </div>
+                <input type="hidden" class="form-control" id="addMappingTermId" name="addSubjects">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAddSubjects">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
 <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
 @section scripts
     {
 
     <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -179,12 +201,16 @@
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
-                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
+                                text += `
+                                                <a href="#" class="btn-icon-split btn-sm btn btn-info js-mapCourses" data-id="${row.id}">
+                                                                                                                    <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-chain' style='color: white' data-id="${row.id}"></i></span>
+                                        </a>
+                                <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
                                                                                                             <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
-                                                        </a>
-                                                                        <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
-                                                                                            <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
-                                                        </a>`;
+                                </a>
+                                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
+                                                                    <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
+                                </a>`;
                                 text += '</div>'
                                 return text;
                             }
@@ -239,46 +265,46 @@
                     $('#sd_empty_error').css("display", "none");
                     $('#ed_empty_error').css("display", "none");
                 });
+            });
 
-                $('#btnSaveitem').on('click', function (e) {
-                    if (!validateForm()) {
-                        return;
-                    } else {
-                        var data = {
-                            termName: $("#term_name").val(),
-                            startDate: $("#start_date").val(),
-                            endDate: $("#end_date").val()
-                        };
-                        $.ajax({
-                            type: "POST",
-                            data: data,
-                            url: "/Terms/Create",
-                            dataType: "json",
-                            success: function (result) {
-                                if (result) {
-                                    $('#term_name').val();
-                                    $('#addNewModal').modal('hide');
-                                    swal({
-                                        title: 'Term Added!',
-                                        text: 'Successfully Created!',
-                                        option: "success",
-                                        icon: "success",
-                                        timer: 3000
-                                    });
-                                    getAll();
-                                } else {
-                                    swal({
-                                        title: 'Term Addition Failed!',
-                                        text: 'Could Not be Added!',
-                                        option: "error",
-                                        icon: "error",
-                                        timer: 3000
-                                    });
-                                }
+            $('#btnSaveitem').on('click', function (e) {
+                if (!validateForm()) {
+                    return;
+                } else {
+                    var data = {
+                        termName: $("#term_name").val(),
+                        startDate: $("#start_date").val(),
+                        endDate: $("#end_date").val()
+                    };
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        url: "/Terms/Create",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result) {
+                                $('#term_name').val();
+                                $('#addNewModal').modal('hide');
+                                swal({
+                                    title: 'Term Added!',
+                                    text: 'Successfully Created!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAll();
+                            } else {
+                                swal({
+                                    title: 'Term Addition Failed!',
+                                    text: 'Could Not be Added!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
                             }
-                        });
-                    }
-                });
+                        }
+                    });
+                }
             });
 
             function populateEditModal(id) {
@@ -365,7 +391,6 @@
                 });
             }
 
-            // Handle Save Changes button click in the Edit Modal
             $("#btnSaveEdit").click(function () {
                 var updatedData = {
                     Id: parseInt($("#edit_term_Id").val(), 10),
@@ -424,6 +449,103 @@
                     }
                 })
             });
+
+            $("#terms").on("click", ".js-mapCourses", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                $('#addMappingTermId').val(data.id);
+                $('#assignModal').modal('show');
+                loadOptionItems(data.id);
+            });
+
+            $('#btnAddSubjects').on('click', function (e) {
+                var Ids = $("#select_item_list").val();
+                var requestData = {
+                    TermId: $('#addMappingTermId').val()
+                };
+
+                if (Ids && Ids.length > 0) {
+                    requestData.SubjectIds = Ids;
+                } else {
+                    requestData.removeAll = true;
+                }
+
+                $.ajax({
+                    url: "/Terms/AddSubjectMapping",
+                    type: "POST",
+                    data: requestData,
+                    dataType: "json",
+                    success: function (data) {
+                        $('#assignModal').modal('hide');
+                        if (data) {
+                            swal({
+                                title: 'Subjects Updated',
+                                text: 'Successfully Updated!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAll();
+                        } else {
+                            swal({
+                                title: 'Change Failed!',
+                                text: 'Could Not be Changed!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.error("Error:", status, error);
+                    },
+                });
+            });
+
+            function loadOptionItems(id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Subjects/GetAllSubjects",
+                    success: function (result) {
+                        if (result) {
+                            $('#select_item_list').html('');
+                            $('#select_item_list').append($("<option></option>"));
+                            $.each(result, function (index, item) {
+                                $('#select_item_list').append($('<option></option>').val(item.id).html(item.subjectName));
+                            });
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                data: {
+                                    id: id
+                                },
+                                url: "/Terms/GetMySubjects",
+                                success: function (res) {
+                                    $('#assignModal #select_item_list').select2({
+                                        placeholder: 'Select Subjects',
+                                        dropdownParent: $('#assignModal'),
+                                        tags: true
+                                    });
+                                    if (res) {
+                                        var MappedList = res.map(a => a.subjectId);
+                                        $("#select_item_list").val(MappedList).trigger('change');
+                                    } else {
+                                        console.log("No Subjects found.");
+                                    }
+                                },
+                                error: function (error) {
+                                    $.unblockUI();
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
         });
 
     </script>
