@@ -144,7 +144,39 @@ namespace BrightBoostApplication.Controllers
             return Json(null);
         }
 
-        
+        [HttpPost]
+        public async Task<JsonResult> AddSubjectMapping([FromBody] TermCourseViewModel data)
+        {
+            try
+            {
+                var term = await _context.Terms.FirstOrDefaultAsync(t => t.Id == data.TermId);
+                if (term == null)
+                {
+                    return Json(new { status = false, message = "Term not found." });
+                }
 
+                var subjects = await _context.Subjects
+                    .Where(s => data.SubjectIds.Contains(s.Id))
+                    .ToListAsync();
+
+                foreach (var subject in subjects)
+                {
+                    var termCourse = new TermCourse
+                    {
+                        Term = term,
+                        Subject = subject,
+                        Title = data.Title
+                    };
+                    _context.TermCourses.Add(termCourse);
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { status = true }); // Successful update
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = false, message = $"An error occurred: {ex.Message}" });
+            }
+        }
     }
 }

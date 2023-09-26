@@ -475,10 +475,10 @@
                     dataType: "json",
                     success: function (data) {
                         $('#assignModal').modal('hide');
-                        if (data) {
+                        if (data.status === true) {
                             swal({
-                                title: 'Subjects Updated',
-                                text: 'Successfully Updated!',
+                                title: 'Subjects Mapping',
+                                text: 'Successfully Mapping!',
                                 option: "success",
                                 icon: "success",
                                 timer: 3000
@@ -486,8 +486,8 @@
                             getAll();
                         } else {
                             swal({
-                                title: 'Change Failed!',
-                                text: 'Could Not be Changed!',
+                                title: 'Mapping Failed!',
+                                text: data.message || 'Could Not mapping!',
                                 option: "error",
                                 icon: "error",
                                 timer: 3000
