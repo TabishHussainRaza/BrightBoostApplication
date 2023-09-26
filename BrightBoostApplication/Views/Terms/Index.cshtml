@@ -504,6 +504,7 @@
             function loadOptionItems(id) {
                 $.ajax({
                     type: "GET",
+                    // TODO I think this api is not right, should add a new api to query the subjects which are not mapping to this term? (Zile Huang)
                     url: "/Subjects/GetAllSubjects",
                     success: function (result) {
                         if (result) {
