@@ -465,13 +465,14 @@
                 if (Ids && Ids.length > 0) {
                     requestData.SubjectIds = Ids;
                 } else {
-                    requestData.removeAll = true;
+                    requestData.RemoveAll = true;
                 }
 
                 $.ajax({
                     url: "/Terms/AddSubjectMapping",
                     type: "POST",
-                    data: requestData,
+                    contentType: "application/json",
+                    data: JSON.stringify(requestData),
                     dataType: "json",
                     success: function (data) {
                         $('#assignModal').modal('hide');
@@ -504,7 +505,6 @@
             function loadOptionItems(id) {
                 $.ajax({
                     type: "GET",
-                    // TODO I think this api is not right, should add a new api to query the subjects which are not mapping to this term? (Zile Huang)
                     url: "/Subjects/GetAllSubjects",
                     success: function (result) {
                         if (result) {

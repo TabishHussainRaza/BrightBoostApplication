@@ -154,20 +154,50 @@ namespace BrightBoostApplication.Controllers
                 {
                     return Json(new { status = false, message = "Term not found." });
                 }
-
-                var subjects = await _context.Subjects
-                    .Where(s => data.SubjectIds.Contains(s.Id))
-                    .ToListAsync();
-
-                foreach (var subject in subjects)
+                
+                if (data.RemoveAll)
                 {
-                    var termCourse = new TermCourse
+                    var existingTermCourses = _context.TermCourses
+                        .Where(tc => tc.TermId == term.Id)
+                        .ToList();
+
+                    _context.TermCourses.RemoveRange(existingTermCourses);
+                }
+                else
+                {
+                    var existingSubjectIds = _context.TermCourses
+                        .Where(tc => tc.TermId == term.Id)
+                        .Select(tc => tc.SubjectId)
+                        .ToList();
+
+                    var subjectsToRemove = existingSubjectIds.Except(data.SubjectIds).ToList();
+
+                    if (subjectsToRemove.Any())
                     {
-                        Term = term,
-                        Subject = subject,
-                        Title = data.Title
-                    };
-                    _context.TermCourses.Add(termCourse);
+                        var termCoursesToRemove = _context.TermCourses
+                            .Where(tc => tc.TermId == term.Id && subjectsToRemove.Contains(tc.SubjectId))
+                            .ToList();
+
+                        _context.TermCourses.RemoveRange(termCoursesToRemove);
+                    }
+
+                    var subjectsToAdd = data.SubjectIds.Except(existingSubjectIds).ToList();
+
+                    foreach (var subjectId in subjectsToAdd)
+                    {
+                        var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subjectId);
+                        if (subject != null)
+                        {
+                            var title = $"{subject.subjectName}({term.TermName})";
+                            var termCourse = new TermCourse
+                            {
+                                Term = term,
+                                Subject = subject,
+                                Title = title
+                            };
+                            _context.TermCourses.Add(termCourse);
+                        }
+                    }
                 }
 
                 await _context.SaveChangesAsync();
