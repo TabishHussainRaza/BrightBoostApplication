@@ -144,7 +144,69 @@ namespace BrightBoostApplication.Controllers
             return Json(null);
         }
 
-        
+        [HttpPost]
+        public async Task<JsonResult> AddSubjectMapping([FromBody] TermCourseViewModel data)
+        {
+            try
+            {
+                var term = await _context.Terms.FirstOrDefaultAsync(t => t.Id == data.TermId);
+                if (term == null)
+                {
+                    return Json(new { status = false, message = "Term not found." });
+                }
+                
+                if (data.RemoveAll)
+                {
+                    var existingTermCourses = _context.TermCourses
+                        .Where(tc => tc.TermId == term.Id)
+                        .ToList();
 
+                    _context.TermCourses.RemoveRange(existingTermCourses);
+                }
+                else
+                {
+                    var existingSubjectIds = _context.TermCourses
+                        .Where(tc => tc.TermId == term.Id)
+                        .Select(tc => tc.SubjectId)
+                        .ToList();
+
+                    var subjectsToRemove = existingSubjectIds.Except(data.SubjectIds).ToList();
+
+                    if (subjectsToRemove.Any())
+                    {
+                        var termCoursesToRemove = _context.TermCourses
+                            .Where(tc => tc.TermId == term.Id && subjectsToRemove.Contains(tc.SubjectId))
+                            .ToList();
+
+                        _context.TermCourses.RemoveRange(termCoursesToRemove);
+                    }
+
+                    var subjectsToAdd = data.SubjectIds.Except(existingSubjectIds).ToList();
+
+                    foreach (var subjectId in subjectsToAdd)
+                    {
+                        var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subjectId);
+                        if (subject != null)
+                        {
+                            var title = $"{subject.subjectName}({term.TermName})";
+                            var termCourse = new TermCourse
+                            {
+                                Term = term,
+                                Subject = subject,
+                                Title = title
+                            };
+                            _context.TermCourses.Add(termCourse);
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { status = true }); // Successful update
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = false, message = $"An error occurred: {ex.Message}" });
+            }
+        }
     }
 }

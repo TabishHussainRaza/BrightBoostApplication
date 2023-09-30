@@ -202,47 +202,45 @@
                     $('#subject_description').val('');
                     $('#subject_description_error').css("display", "none");
                 });
+            });
+            $('#btnSaveitem').on('click', function (e) {
+                if (!validateForm()) {
+                    return;
+                } else {
+                    var data = {
+                        name: $("#subject_name").val(),
+                        description: $("#subject_description").val(),
+                    };
 
-                $('#btnSaveitem').on('click', function (e) {
-                    if (!validateForm()) {
-                        return;
-                    } else {
-                        var data = {
-                            name: $("#subject_name").val(),
-                            description: $("#subject_description").val(),
-                        };
-
-                        $.ajax({
-                            type: "POST",
-                            data: data,
-                            url: "/Subjects/CreateSubject",
-                            dataType: "json",
-                            success: function (result) {
-                                if (result) {
-                                    $('#term_name').val();
-                                    $('#addNewModal').modal('hide');
-                                    swal({
-                                        title: 'Subject Added!',
-                                        text: 'Successfully Created!',
-                                        option: "success",
-                                        icon: "success",
-                                        timer: 3000
-                                    });
-                                    getAll();
-                                } else {
-                                    swal({
-                                        title: 'Subject Addition Failed!',
-                                        text: 'Could Not be Added!',
-                                        option: "error",
-                                        icon: "error",
-                                        timer: 3000
-                                    });
-                                }
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        url: "/Subjects/CreateSubject",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result) {
+                                $('#term_name').val();
+                                $('#addNewModal').modal('hide');
+                                swal({
+                                    title: 'Subject Added!',
+                                    text: 'Successfully Created!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAll();
+                            } else {
+                                swal({
+                                    title: 'Subject Addition Failed!',
+                                    text: 'Could Not be Added!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
                             }
-                        });
-                    }
-                });
-
+                        }
+                    });
+                }
             });
 
             function populateEditModal(id) {
