@@ -85,6 +85,21 @@
                                 </ul>
                             </li>
                         }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Student"))
+                        {
+                            <li class="nav-item">
+                                <a href="@Url.Action("Dashboard", "StudentsTerm")" class="nav-link">
+                                    <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "StudentsTerm")" class="nav-link">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Register</p>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </nav>
             </div>

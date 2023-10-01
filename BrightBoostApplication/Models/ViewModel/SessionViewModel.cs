@@ -1,7 +1,10 @@
 ﻿namespace BrightBoostApplication.Models.ViewModel
 {
+    public class SessionViewModel :Session
+    {
+    }
 
-    public class SessionViewModel
+    public class SessionUpdateViewModel
     {
         public int Id { get; set; }
         public string SessionName { get; set; }

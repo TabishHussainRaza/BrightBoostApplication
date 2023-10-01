@@ -4,6 +4,7 @@ using BrightBoostApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BrightBoostApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231001025239_termUpdate")]
+    partial class termUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,29 +289,6 @@ namespace BrightBoostApplication.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Student");
-                });
-
-            modelBuilder.Entity("BrightBoostApplication.Models.StudentCourseSignUp", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("termCourseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("termCourseId");
-
-                    b.ToTable("StudentCourseSignUps");
                 });
 
             modelBuilder.Entity("BrightBoostApplication.Models.StudentSignUp", b =>
@@ -664,25 +643,6 @@ namespace BrightBoostApplication.Data.Migrations
                     b.Navigation("TermCourse");
                 });
 
-            modelBuilder.Entity("BrightBoostApplication.Models.StudentCourseSignUp", b =>
-                {
-                    b.HasOne("BrightBoostApplication.Models.Student", "Student")
-                        .WithMany("StudentCourseSignUp")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BrightBoostApplication.Models.TermCourse", "TermCourse")
-                        .WithMany("StudentCourseSignUp")
-                        .HasForeignKey("termCourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-
-                    b.Navigation("TermCourse");
-                });
-
             modelBuilder.Entity("BrightBoostApplication.Models.StudentSignUp", b =>
                 {
                     b.HasOne("BrightBoostApplication.Models.Session", "Session")
@@ -800,8 +760,6 @@ namespace BrightBoostApplication.Data.Migrations
 
             modelBuilder.Entity("BrightBoostApplication.Models.Student", b =>
                 {
-                    b.Navigation("StudentCourseSignUp");
-
                     b.Navigation("StudentSignUp");
                 });
 
@@ -815,11 +773,6 @@ namespace BrightBoostApplication.Data.Migrations
             modelBuilder.Entity("BrightBoostApplication.Models.Term", b =>
                 {
                     b.Navigation("TermCourse");
-                });
-
-            modelBuilder.Entity("BrightBoostApplication.Models.TermCourse", b =>
-                {
-                    b.Navigation("StudentCourseSignUp");
                 });
 
             modelBuilder.Entity("BrightBoostApplication.Models.Tutor", b =>
