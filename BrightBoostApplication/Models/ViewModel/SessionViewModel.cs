@@ -9,5 +9,6 @@
         public string SessionVenue { get; set; }
         public DateTime? startTime { get; set; }
         public DateTime? EndTime { get; set; }
+        public int? MaxNumber { get; set; }
     }
 }

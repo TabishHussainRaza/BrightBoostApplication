@@ -57,7 +57,7 @@ namespace BrightBoostApplication.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Create(int termCouseId, string SessionName, string SessionDay, string SessionVenue, DateTime? startTime, DateTime? endTime)
+        public async Task<JsonResult> Create(int termCouseId, string SessionName, string SessionDay, string SessionVenue,int? sessionCap, DateTime? startTime, DateTime? endTime)
         {
             if (termCouseId != 0 && !string.IsNullOrEmpty(SessionName) && !string.IsNullOrEmpty(SessionDay) && !string.IsNullOrEmpty(SessionVenue))
             {
@@ -77,7 +77,8 @@ namespace BrightBoostApplication.Controllers
                     createdDate=DateTime.Now,
                     updateDate=DateTime.Now,
                     fkId = termCourse.Id,
-                    TermCourse = termCourse
+                    TermCourse = termCourse,
+                    MaxNumber = sessionCap
                 };
                 _context.Add(session);
                 await _context.SaveChangesAsync();
@@ -123,9 +124,8 @@ namespace BrightBoostApplication.Controllers
                     existingSession.SessionName = updatedSession.SessionName;
                     existingSession.SessionDay = updatedSession.SessionDay;
                     existingSession.SessionVenue = updatedSession.SessionVenue;
-                    existingSession.startTime = updatedSession.startTime;
-                    existingSession.EndTime = updatedSession.EndTime;
                     existingSession.updateDate = DateTime.Now;
+                    existingSession.MaxNumber = updatedSession.MaxNumber;
                     // Save changes to the database
                     await _context.SaveChangesAsync();
 

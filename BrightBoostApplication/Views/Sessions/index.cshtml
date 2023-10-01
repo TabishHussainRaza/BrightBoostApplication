@@ -22,7 +22,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -68,6 +67,10 @@
                         <span id="session_venue_error" class="text-danger small" style="display:none">Session Venue Required</span>
                         <br />
 
+                        <label class="label" for="session_cap"><b>Student Capacity </b></label>
+                        <input type="text" id="session_cap" class="form-control" name="session_cap" style="width:100%" />
+                        <span id="session_cap_error" class="text-danger small" style="display:none">Session Capacity Required</span>
+                        <br />
                     </div>
                 </div>
             </div>
@@ -105,9 +108,15 @@
                         </select>
                         <span id="session_day_error_edit" class="text-danger small" style="display:none">Session Day Required</span>
                         <br />
+
                         <label class="label" for="edit_session_venue"><b>Session Venue</b></label>
                         <input type="text" id="edit_session_venue" class="form-control" name="edit_session_venue" />
                         <span id="session_venue_error_edit" class="text-danger small" style="display:none">Session Venue Required</span>
+                        <br />
+
+                        <label class="label" for="edit_session_cap"><b>Student Capacity </b></label>
+                        <input type="text" id="edit_session_cap" class="form-control" name="edit_session_cap" style="width:100%" />
+                        <span id="session_cap_error_edit" class="text-danger small" style="display:none">Session Capacity Required</span>
                         <br />
                     </div>
                 </div>
@@ -204,12 +213,12 @@
                     $('#session_name').val('');
                     $('#session_day').val('');
                     $('#session_venue').val('');
-                    $('#session_start_time').val('');
-                    $('#session_end_time').val('');
+                    $('#session_cap').val('');
 
                     $('#session_name_error').css('display', 'none');
                     $('#session_day_error').css('display', 'none');
                     $('#session_venue_error').css('display', 'none');
+                    $('#session_cap_error').css('display', 'none');
                 });
             });
 
@@ -220,11 +229,13 @@
                 const sessionNameInput = $('#session_name');
                 const sessionDaySelect = $('#session_day');
                 const sessionVenueInput = $('#session_venue');
+                const sessionCap = $('#session_cap');
 
                 // Get references to the error message spans
                 const sessionNameError = $('#session_name_error');
                 const sessionDayError = $('#session_day_error');
                 const sessionVenueError = $('#session_venue_error');
+                const sessionCapError = $('#session_cap_error');
 
                 if (sessionNameInput.val().trim() === '') {
                     sessionNameError.css('display', 'block');
@@ -249,6 +260,14 @@
                     sessionVenueError.css('display', 'none');
                 }
 
+                // Validate session venue
+                if (sessionCap.val().trim() === '') {
+                    sessionCapError.css('display', 'block');
+                    result = false;
+                } else {
+                    sessionCapError.css('display', 'none');
+                }
+
                 return result;
             }
 
@@ -260,6 +279,7 @@
                         SessionName: $('#session_name').val(),
                         SessionDay: $('#session_day').val(),
                         SessionVenue: $('#session_venue').val(),
+                        sessionCap: $('#session_cap').val(),
                     };
 
                     $.ajax({
@@ -303,7 +323,9 @@
                             $("#edit_session_name").val(data.sessionName);
                             $("#edit_session_day").val(data.sessionDay);
                             $("#edit_session_venue").val(data.sessionVenue);
+                            $("#edit_session_cap").val(data.maxNumber);
                             $("#editSessionModal").modal("show");
+
                         } else {
                             swal({
                                 title: 'No details found!',
@@ -336,6 +358,7 @@
                 $('#edit_session_name').val('');
                 $('#edit_session_day').val('');
                 $('#edit_session_venue').val('');
+                $("#edit_session_cap").val('');
             });
 
             $("#btnUpdateSession").on('click', function (e) {
@@ -344,7 +367,8 @@
                         Id: $("#edit_session_id").val(),
                         SessionName: $("#edit_session_name").val(),
                         SessionDay: $("#edit_session_day").val(),
-                        SessionVenue: $("#edit_session_venue").val()
+                        SessionVenue: $("#edit_session_venue").val(),
+                        MaxNumber: $("#edit_session_cap").val()
                     };
 
                     $.ajax({
@@ -396,6 +420,7 @@
                 var sessionName = $("#edit_session_name").val();
                 var sessionDay = $("#edit_session_day").val();
                 var sessionVenue = $("#edit_session_venue").val();
+                var max = $("#edit_session_cap").val();
 
                 var isValid = true;
 
@@ -411,6 +436,11 @@
 
                 if (!sessionVenue) {
                     $("#session_venue_error_edit").show(); // Show error message for Session Venue
+                    isValid = false;
+                }
+
+                if (!max) {
+                    $("#session_cap_error_edit").show(); // Show error message for Session Venue
                     isValid = false;
                 }
 
