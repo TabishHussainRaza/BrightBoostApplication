@@ -23,39 +23,62 @@ namespace BrightBoostApplication.Controllers
         }
 
         // GET: Sessions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id)
         {
-            return _context.Sessions != null ?
-                        View(await _context.Sessions.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.Sessions'  is null.");
+            if (id == null || _context.TermCourses == null)
+            {
+                return NotFound();
+            }
+
+            var termCourse = _context.TermCourses.Where(i => i.Id == id).FirstOrDefault();
+            if (termCourse == null)
+            {
+                return NotFound();
+            }
+
+            return View(termCourse);
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAllSessionsAsync()
+        public async Task<JsonResult> GetAllSessionsAsync(int id)
         {
-            var sessions = new List<Term>();
-            if (_context.Sessions != null)
+            if (id == null || _context.TermCourses == null)
             {
-                sessions = await _context.Terms.Where(i => i.isActive == true).ToListAsync();
+                return Json(new { status = false, message = $"No Id provided" });
             }
+
+            var term = _context.TermCourses.Where(i => i.Id == id).FirstOrDefault();
+            if (term == null)
+            {
+                return Json(new { status = false, message = $"No Term Details Found" });
+            }
+            var sessions = _context.Sessions.Where(s=>s.fkId == id && s.isActive == true).ToList();
             return Json(sessions);
         }
 
         [HttpPost]
-        public async Task<JsonResult> Create(string SessionName, string SessionDay, string SessionVenue, DateTime startTime, DateTime endTime)
+        public async Task<JsonResult> Create(int termCouseId, string SessionName, string SessionDay, string SessionVenue,int? sessionCap, DateTime? startTime, DateTime? endTime)
         {
-            if (!string.IsNullOrEmpty(SessionName))
+            if (termCouseId != 0 && !string.IsNullOrEmpty(SessionName) && !string.IsNullOrEmpty(SessionDay) && !string.IsNullOrEmpty(SessionVenue))
             {
+                var termCourse = _context.TermCourses.Where(i => i.Id == termCouseId).FirstOrDefault();
+                if(termCourse == null)
+                {
+                    return Json(false);
+                }
+
                 var session = new Session()
                 {
                     SessionName = SessionName,
                     SessionDay = SessionDay,
                     SessionVenue = SessionVenue,
-                    startTime = DateTime.Now,
-                    EndTime = DateTime.Now,
                     isActive = true,
-                    SessionColor = "red",
-                    fkId = -1
+                    SessionColor = "",
+                    createdDate=DateTime.Now,
+                    updateDate=DateTime.Now,
+                    fkId = termCourse.Id,
+                    TermCourse = termCourse,
+                    MaxNumber = sessionCap
                 };
                 _context.Add(session);
                 await _context.SaveChangesAsync();
@@ -66,7 +89,7 @@ namespace BrightBoostApplication.Controllers
 
         // GET: Sessions/Details/5
         [HttpGet]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<JsonResult> Details(int? id)
         {
             if (id == null || _context.Sessions == null)
             {
@@ -101,9 +124,8 @@ namespace BrightBoostApplication.Controllers
                     existingSession.SessionName = updatedSession.SessionName;
                     existingSession.SessionDay = updatedSession.SessionDay;
                     existingSession.SessionVenue = updatedSession.SessionVenue;
-                    existingSession.startTime = updatedSession.startTime;
-                    existingSession.EndTime = updatedSession.EndTime;
                     existingSession.updateDate = DateTime.Now;
+                    existingSession.MaxNumber = updatedSession.MaxNumber;
                     // Save changes to the database
                     await _context.SaveChangesAsync();
 
