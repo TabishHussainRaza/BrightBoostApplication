@@ -1,13 +1,14 @@
-﻿@{
+﻿@model BrightBoostApplication.Models.Tutor
+@{
     ViewBag.Title = "Expertise Management";
 }
 
 <div class="card">
     <div class="card-header">
         <div class="d-flex align-items-center">
-            <h3 class="mr-auto">My Profile</h3>
+            <h3 class="mr-auto">My Expertise</h3>
             <div class="btn-group" role="group">
-                <button id="addNew" class="btn btn-primary"> <i class='fa fa-eye' style='color: white'></i> Expertise</button>
+                <button id="addNew" class="btn btn-primary">Expertise</button>
             </div>
         </div>
     </div>
@@ -17,6 +18,29 @@
                 <div class="col-sm-12">
                     <div class="table-responsive">
                         <table id="exp" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">My Availability</h3>
+            <div class="btn-group" role="group">
+                <button id="addNewAvailability" class="btn btn-primary">Availability</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="avail" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
                     </div>
                 </div>
             </div>
@@ -44,7 +68,8 @@
                         <label for="select_item_list" class="form-label">Subjects</label>
                         <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
                     </div>
-                </div>          
+                </div>     
+                <input type="hidden" class="form-control" id="tutorId" name="tutorId" value="@Model.Id">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -64,19 +89,18 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="days">Select Days:</label>
-                    <select id="days" class="days-dropdown" multiple>
-                        <option value="monday">Monday</option>
-                        <option value="tuesday">Tuesday</option>
-                        <option value="wednesday">Wednesday</option>
-                        <option value="thursday">Thursday</option>
-                        <option value="friday">Friday</option>
+                    <select id="days" class="days-dropdown" name="availability" multiple>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
                     </select>
                 </div>
-                <input type="hidden" class="form-control" id="addSubjectId" name="addSubjects">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="btnAddSubjects">Add</button>
+                <button type="button" class="btn btn-primary" id="btnAddAvail">Add</button>
             </div>
         </div>
     </div>
@@ -94,15 +118,264 @@
             // Get all Expertises 
             // For each expertise we will add the availability
 
+            var tutorId = @Model.Id;
+            var DataTable = null;
+
+            function getAll() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/Expertises/GetMyExpertise",
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+                            if (DataTable == null) {
+                                initializeDataTable(result);
+                            } else {
+                                updateDataTable(result);
+                            }
+                        } else {
+                            console.log("No Items found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateDataTable(updatedData) {
+                DataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeDataTable(data) {
+                DataTable = $('#exp').DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Subject name',
+                            data: 'subjectName'
+                        },
+                        {
+                            title: 'Subject name',
+                            data: 'subjectDescription'
+                        }
+                    ]
+                });
+            }
+
+            getAll();
+
 
             $('#addNew').on('click', function (e) {
                 //Get all subjects then show modal
+                loadOptionItems(tutorId);
                 $('#addNewModal').modal('show');
             });
 
+            function loadOptionItems(id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Expertises/GetAllSubjects",
+                    success: function (result) {
+                        if (result) {
+                            $('#select_item_list').html('');
+                            $('#select_item_list').append($("<option></option>"));
+                            $.each(result, function (index, item) {
+                                $('#select_item_list').append($('<option></option>').val(item.id).html(item.subjectName));
+                            });
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                data: {
+                                    id: id
+                                },
+                                url: "/Expertises/GetMyExpertise",
+                                success: function (res) {
+                                    $('#addNewModal #select_item_list').select2({
+                                        placeholder: 'Select Subjects',
+                                        dropdownParent: $('#addNewModal'),
+                                        tags: true
+                                    });
+                                    if (res) {
+                                        var MappedList = res.map(a => a.id);
+                                        $("#select_item_list").val(MappedList).trigger('change');
+                                    } else {
+                                        console.log("No Subjects found.");
+                                    }
+                                },
+                                error: function (error) {
+                                    $.unblockUI();
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+            
+
             $('#btnSaveitem').on('click', function (e) {
                 //Call AJAX to add the Expertise
-            });            
+                var Ids = $("#select_item_list").val();
+                var requestData = {
+                    TutorId: $('#tutorId').val()
+                };
+
+                if (Ids && Ids.length > 0) {
+                    requestData.SubjectIds = Ids;
+                } else {
+                    requestData.RemoveAll = true;
+                }
+
+                $.ajax({
+                    url: "/Expertises/AddSubjectMapping",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(requestData),
+                    dataType: "json",
+                    success: function (data) {
+                        $('#addNewModal').modal('hide');
+                        if (data.status === true) {
+                            swal({
+                                title: 'Subjects Mapping',
+                                text: 'Successfully Mapping!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAll();
+                        } else {
+                            swal({
+                                title: 'Mapping Failed!',
+                                text: data.message || 'Could Not mapping!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", status, error);
+                    },
+                });
+            });
+
+            var AvDataTable = null;
+
+            function getAvaiAll() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/Expertises/GetAllAvailability",
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+                            if (AvDataTable == null) {
+                                initializeAvailDataTable(result);
+                            } else {
+                                updateAvailDataTable(result);
+                            }
+                        } else {
+                            console.log("No Items found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateAvailDataTable(updatedData) {
+                AvDataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeAvailDataTable(data) {
+                AvDataTable = $('#avail').DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Day',
+                            render: function (data, type, row, meta) {
+                                return row;
+                            }
+                        },
+                    ]
+                });
+            }
+
+            getAvaiAll();
+
+            $('#addNewAvailability').on('click', function (e) {
+                //Get all subjects then show modal
+                loadAvailability(tutorId);
+                $('#availabilityModal').modal('show');
+            });
+
+            function loadAvailability(id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Expertises/GetAllAvailability",
+                    success: function (result) {
+                        $('#availabilityModal #days').select2({
+                            placeholder: 'Select Availability',
+                            dropdownParent: $('#availabilityModal'),
+                            tags: true
+                        });
+                        if (result) {
+                            $("#days").val(result).trigger('change');
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            $('#btnAddAvail').on('click', function (e) {
+
+                //Call AJAX to add the Expertise
+                var Ids = $("#days").val();
+                var joinedIds = Ids?.join(',');
+                var requestData = {
+                    id: tutorId,
+                    availability: joinedIds
+                };
+
+                $.ajax({
+                    url: "/Expertises/AddExpAvailability",
+                    type: "POST",
+                    data: requestData,
+                    dataType: "json",
+                    success: function (data) {
+                        $('#availabilityModal').modal('hide');
+                        if (data.status === true) {
+                            swal({
+                                title: 'Availability Operation',
+                                text: 'Successful!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAvaiAll();
+                        } else {
+                            swal({
+                                title: 'Availability Operation Failed!',
+                                text: data.message || 'Could Not Complete!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", status, error);
+                    },
+                });
+
+            });
         });
 
     </script>
