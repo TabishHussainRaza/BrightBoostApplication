@@ -129,12 +129,36 @@
     </div>
 </div>
 
+<div class="modal fade" id="assignModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Assign Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Tutors</label>
+                    <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
+                </div>
 
+                <input type="hidden" class="form-control sessionId" id="sessionId" name="sessionId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAssign">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
 <link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
 @section scripts
     {
 
     <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -190,7 +214,11 @@
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
-                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}" data-name="${row.name}">
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-info js-assign" data-id="${row.id}">
+                                                             <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-person' style='color: white' data-id="${row.id}"></i></span>
+                                                                </a>
+                                
+                                <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}" data-name="${row.name}">
                                                     <span class="icon text-white-50" data-id="${row.id}" data-name="${row.name}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}" data-name="${row.name}"></i></span>
                                                         </a>
                                                         <a href = "#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}" >
@@ -495,6 +523,103 @@
                         swal("Cancelled", "Session Not deleted", "error");
                     }
                 })
+            });
+
+            $("#sessions").on("click", ".js-assign", function (e) {
+                var sessionId = $(this).data("id");
+                renderAssignModal(sessionId);
+                $('#sessionId').val(sessionId);
+                $('#sessionId').val(sessionId);
+                $('#assignModal').modal('show');
+            });
+
+            function renderAssignModal(id){
+                $.ajax({
+                    type: "GET",
+                    url: "/Sessions/GetAllTutors?id=" + id,
+                    success: function (result) {
+                        if(result.status == true){
+                            $('#select_item_list').html('');
+                            $('#select_item_list').append($("<option></option>"));
+                            $.each(result.data, function (index, item) {
+                                $('#select_item_list').append($('<option></option>').val(item.tutorId).html(item.name));
+                            });
+
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                data: {
+                                    id: id
+                                },
+                                url: "/Sessions/GetMyTutors",
+                                success: function (res) {
+                                    $('#assignModal #select_item_list').select2({
+                                        placeholder: 'Select Tutors',
+                                        dropdownParent: $('#assignModal'),
+                                        tags: true
+                                    });
+                                    if (res.status && res.data != null) {
+                                        var tutors = res.data.map(a => a.tutorId);
+                                        $("#select_item_list").val(tutors).trigger('change');
+                                    } else {
+                                        console.log("No Roles found.");
+                                    }
+                                },
+                                error: function (error) {
+                                    $.unblockUI();
+                                }
+                            });
+                            
+                           
+                        }
+                    },
+                    error: function (error) {
+                        
+                    }
+                });
+            }
+
+            $('#btnAssign').on('click', function (e) {
+                var TutorId = $("#select_item_list").val();
+                var requestData = {
+                    SessionId: $("#sessionId").val()
+                };
+                if (TutorId && TutorId.length > 0) {
+                    requestData.TutorId = TutorId;
+                } else {
+                    requestData.removeAll = true;
+                }
+                $.ajax({
+                    url: "/Sessions/AllocateTutor",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(requestData),
+                    dataType: "json",
+                    success: function (data) {
+                        $('#assignModal').modal('hide');
+                        if (data) {
+                            swal({
+                                title: 'Allocation Updated!',
+                                text: 'Successfully Updated!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAllSessions();
+                        } else {
+                            swal({
+                                title: 'Allocation Failed!',
+                                text: 'Could Not be Changed!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", status, error);
+                    }
+                });
             });
 
         });

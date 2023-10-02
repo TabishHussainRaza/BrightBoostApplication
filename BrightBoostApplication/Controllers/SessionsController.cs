@@ -159,5 +159,122 @@ namespace BrightBoostApplication.Controllers
             await _context.SaveChangesAsync();
             return Json(true);
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetAllTutors(int id)
+        {
+            if (id == null)
+            {
+                return Json(new { status = false, message = $"No Id provided" });
+            }
+
+            var session = _context.Sessions.Where(i => i.Id == id).Include(s=>s.TermCourse).FirstOrDefault();
+            if (session == null)
+            {
+                return Json(new { status = false, message = $"No Session Details Found" });
+            }
+
+            var AllTutors = _context.Tutors.Include(e=>e.Expertise).ToList();
+            var relTutors = AllTutors.Where(t => t.Expertise.Any(e => e.SubjectId == session.TermCourse.SubjectId) && t.isActive == true && t.Availability.Contains(session.SessionDay)).Select(tc => new TutorViewModel
+            {
+                TutorId = tc.Id,
+                Name = _context.Users.Where(u => u.Id == tc.userId).FirstOrDefault().firstName,
+            }).ToList();
+            return Json(new { status = true, data = relTutors });
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetMyTutors(int id)
+        {
+            if (id == null)
+            {
+                return Json(new { status = false, message = $"No Id provided" });
+            }
+
+            var session = _context.Sessions.Where(i => i.Id == id).Include(s => s.TutorAllocation).ThenInclude(ta=>ta.Tutor).FirstOrDefault();
+            if (session == null)
+            {
+                return Json(new { status = false, message = $"No Session Details Found" });
+            }
+            try
+            {
+                var relTutors = session.TutorAllocation.Select(tc => new TutorViewModel
+                {
+                    TutorId = tc.Id,
+                    Name = _context.Users.Where(u => u.Id == tc.Tutor.userId).FirstOrDefault().firstName,
+                }).ToList();
+                return Json(new { status = true, data = relTutors });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = false, message = $"An error occurred: {ex.Message}" });
+            }
+            
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> AllocateTutor([FromBody] TutorCRUDViewModel data)
+        {
+            try
+            {
+                var session = await _context.Sessions.FirstOrDefaultAsync(t => t.Id == data.SessionId);
+                if (session == null)
+                {
+                    return Json(new { status = false, message = "Term not found." });
+                }
+
+                if (data.RemoveAll)
+                {
+                    var existing = _context.TutorAllocations
+                        .Where(tc => tc.SessionId == session.Id)
+                        .ToList();
+
+                    _context.TutorAllocations.RemoveRange(existing);
+                }
+                else
+                {
+                    var existingTutorsIds = _context.TutorAllocations
+                        .Where(tc => tc.SessionId == session.Id)
+                        .Select(tc => tc.TutorId)
+                        .ToList();
+
+                    var tutorsToRemove = existingTutorsIds.Except(data.TutorId).ToList();
+
+                    if (existingTutorsIds.Any())
+                    {
+                        var termCoursesToRemove = _context.TutorAllocations
+                            .Where(tc => tc.SessionId == session.Id && existingTutorsIds.Contains(tc.TutorId))
+                            .ToList();
+
+                        _context.TutorAllocations.RemoveRange(termCoursesToRemove);
+                    }
+
+                    var toAdd = data.TutorId.Except(existingTutorsIds).ToList();
+
+                    foreach (var tutorId in toAdd)
+                    {
+                        var tutor = await _context.Tutors.FirstOrDefaultAsync(s => s.Id == tutorId);
+                        if (tutor != null)
+                        {
+                            var allTutor = new TutorAllocation()
+                            {
+                                Tutor = tutor,
+                                Session = session,
+                                SessionId = session.Id,
+                                TutorId = tutorId
+                            };
+                            _context.TutorAllocations.Add(allTutor);
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { status = true }); // Successful update
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = false, message = $"An error occurred: {ex.Message}" });
+            }
+        }
     }
 }
