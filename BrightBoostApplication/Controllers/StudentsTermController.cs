@@ -239,8 +239,8 @@ namespace BrightBoostApplication.Controllers
                             if (existingSession != null)
                             {
                                 _context.StudentSignUps.Remove(existingSession); // Remove the old session sign-up
+                                session.currentCap--;
                             }
-
                             var studentsign = new StudentSignUp()
                             {
                                 SessionId = session.Id,
@@ -248,15 +248,12 @@ namespace BrightBoostApplication.Controllers
                                 Student = student,
                                 StudentId = student.Id,
                             };
-
+                            session.currentCap++;
                             _context.Add(studentsign);
                             _context.SaveChanges();
-
                             return Json(new { status = true }); // Successful update
-                        }
-                        
+                        }      
                     }
-
                 }
                 return Json(new { status = false, message = "Processing Failed." });
             }
