@@ -1,22 +1,31 @@
-﻿@model BrightBoostApplication.Models.Student
+﻿@model BrightBoostApplication.Models.ViewModel.TermSubjectViewModel
 @{
-    ViewBag.Title = "Student Dashboard";
-    ViewBag.description = "stuTerms";
+    ViewBag.Title = "Student Course";
+    ViewBag.description = "stuTermsCourse";
 }
 
 <div class="card">
     <div class="card-header">
         <div class="d-flex align-items-center">
-            <h3 class="mr-auto">My Courses</h3>
+            <h2 class="mr-auto">@Model.subjectName</h2>
         </div>
     </div>
     <div class="card-body">
         <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="table-responsive">
-                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    <h3>Course Introduction</h3>
+                    <p>Welcome to <b>@Model.subjectName</b></p>
+                    <p>@Model.subjectDescription</p>
+                    <br />
+                    <h3>My Allocated Sessions</h3>
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table id="sessions" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                        </div>
                     </div>
+                     <br />
+                    <br />
                 </div>
             </div>
         </div>
@@ -36,23 +45,26 @@
     <script>
         $(document).ready(function () {
 
-            var DataTable = null;
+            var sessionsDataTable = null;
+            var TermCourseId = @Model.TermCourseId;
 
-            function getAll() {
+            function getAllSessions() {
                 $.blockUI({ message: '<p>Loading..</p>' });
                 $.ajax({
                     type: "GET",
-                    url: `/StudentsTerm/MyRegistrations?id=${@Model.Id}`,
+                    url: "/Tutors/GetAllocatedSessions?id=" + TermCourseId,
                     success: function (result) {
                         $.unblockUI();
                         if (result) {
-                            if (DataTable == null) {
+
+                            if (sessionsDataTable == null) {
                                 initializeDataTable(result);
                             } else {
                                 updateDataTable(result);
                             }
+
                         } else {
-                            console.log("No Items found.");
+                            console.log("No sessions found.");
                         }
                     },
                     error: function (error) {
@@ -62,24 +74,32 @@
             }
 
             function updateDataTable(updatedData) {
-                DataTable.clear().rows.add(updatedData).draw();
+                sessionsDataTable.clear().rows.add(updatedData).draw();
             }
 
             function initializeDataTable(data) {
-                DataTable = $(`#@ViewBag.description`).DataTable({
+                sessionsDataTable = $('#sessions').DataTable({
                     data: data,
                     columns: [
                         {
-                            title: 'Subject name',
-                            data: 'subjectName'
+                            title: 'Session Name',
+                            data: 'sessionName'
+                        },
+                        {
+                            title: 'Session Day',
+                            data: 'sessionDay'
+                        },
+                        {
+                            title: 'Session Venue',
+                            data: 'sessionVenue'
                         },
                         {
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
-                                text += `<a href="/StudentsTerm/Course?id=${row?.termCourseId}" class="btn-icon-split btn-sm btn btn-secondary js-update" data-id="${row?.termCourseId}">
-                                                        <span class="icon text-white-50" data-id="${row?.termCourseId}"><i class='fa fa-eye' style='color: white' data-id="${row?.termCourseId}"></i></span>
-                                                                                </a>`;
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-info" data-id="${row.id}">
+                                                <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-eye' style='color: white' data-id="${row.id}"></i></span>
+                                                </a>`;
                                 text += '</div>'
                                 return text;
                             }
@@ -88,8 +108,7 @@
                 });
             }
 
-            getAll();
-
+            getAllSessions();
         });
 
     </script>

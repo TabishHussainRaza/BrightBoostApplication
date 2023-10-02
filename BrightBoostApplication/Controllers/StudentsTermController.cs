@@ -295,5 +295,29 @@ namespace BrightBoostApplication.Controllers
             }
             return Json(new { status = false, message = "Processing Failed." });
         }
+
+        public async Task<JsonResult> GetAllocatedSessions(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                // Get the user's ID
+                var userId = user.Id;
+                var student = _context.Student.Where(s => s.userId == userId).FirstOrDefault();
+                if (student != null)
+                {
+                    var allocations = _context.StudentSignUps.Where(t => t.StudentId == student.Id && t.Session.TermCourse.Id == id).Include(s => s.Session).ThenInclude(o => o.TermCourse).Select(tc => new SessionViewModel
+                    {
+                        SessionName = tc.Session.SessionName,
+                        SessionDay = tc.Session.SessionDay,
+                        SessionVenue = tc.Session.SessionVenue,
+                        Id = tc.Session.Id
+                    }).ToList();
+                    return Json(allocations);
+                }
+
+            }
+            return Json(false);
+        }
     }
 }

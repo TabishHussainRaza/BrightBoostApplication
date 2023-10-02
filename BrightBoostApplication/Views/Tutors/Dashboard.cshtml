@@ -1,7 +1,7 @@
-﻿@model BrightBoostApplication.Models.Student
+﻿@model BrightBoostApplication.Models.Tutor
 @{
-    ViewBag.Title = "Student Dashboard";
-    ViewBag.description = "stuTerms";
+    ViewBag.Title = "Tutor Dashboard";
+    ViewBag.description = "tutorTerms";
 }
 
 <div class="card">
@@ -42,7 +42,7 @@
                 $.blockUI({ message: '<p>Loading..</p>' });
                 $.ajax({
                     type: "GET",
-                    url: `/StudentsTerm/MyRegistrations?id=${@Model.Id}`,
+                    url: `/Tutors/MyAllocation`,
                     success: function (result) {
                         $.unblockUI();
                         if (result) {
@@ -77,9 +77,9 @@
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
-                                text += `<a href="/StudentsTerm/Course?id=${row?.termCourseId}" class="btn-icon-split btn-sm btn btn-secondary js-update" data-id="${row?.termCourseId}">
-                                                        <span class="icon text-white-50" data-id="${row?.termCourseId}"><i class='fa fa-eye' style='color: white' data-id="${row?.termCourseId}"></i></span>
-                                                                                </a>`;
+                                text += `<a href="/Tutors/Course?id=${row?.termCourseId}" class="btn-icon-split btn-sm btn btn-secondary js-update" data-id="${row?.termCourseId}">
+                                                                        <span class="icon text-white-50" data-id="${row?.termCourseId}"><i class='fa fa-eye' style='color: white' data-id="${row?.termCourseId}"></i></span>
+                                                                                                </a>`;
                                 text += '</div>'
                                 return text;
                             }

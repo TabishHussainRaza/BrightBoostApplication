@@ -4,6 +4,7 @@ namespace BrightBoostApplication.Models.ViewModel
     {
         public int TermCourseId { get; set; }
         public int? StuId { get; set; }
+        public int? TutorId { get; set; }
     }
 }
 
