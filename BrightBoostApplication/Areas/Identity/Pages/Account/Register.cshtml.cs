@@ -93,6 +93,7 @@ namespace BrightBoostApplication.Areas.Identity.Pages.Account
                         userId= user.Id,
                         createdDate = DateTime.Now,
                         updateDate = DateTime.Now,
+                        isActive = true,
                     };
                     _context.Add(student);
                     _context.SaveChanges();

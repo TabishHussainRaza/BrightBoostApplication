@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using BrightBoostApplication.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using BrightBoostApplication.Data;
 
 namespace Identity.Controllers
 {
@@ -12,12 +14,14 @@ namespace Identity.Controllers
     {
         private RoleManager<IdentityRole>? roleManager;
         private UserManager<ApplicationUser>? userManager;
+        private readonly ApplicationDbContext _context;
         private IMapper? _mapper;
-        public RoleController(RoleManager<IdentityRole> roleMgr, UserManager<ApplicationUser> userMrg, IMapper mapper)
+        public RoleController(RoleManager<IdentityRole> roleMgr, UserManager<ApplicationUser> userMrg, IMapper mapper, ApplicationDbContext context)
         {
             roleManager = roleMgr;
             userManager = userMrg;
             _mapper = mapper;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -127,6 +131,40 @@ namespace Identity.Controllers
                     {
                         var roleDetails = await roleManager.FindByIdAsync(id);
                         var currResult = await userManager.AddToRoleAsync(user, roleDetails.Name);
+
+                        if(roleDetails.NormalizedName == "STUDENT")
+                        {
+                            var existingStudent = _context.Student.Where(s => s.userId == RoleAssignModel.userId).FirstOrDefault();
+                            if(existingStudent == null)
+                            {
+                                var student = new Student()
+                                {
+                                    userId = RoleAssignModel.userId,
+                                    createdDate = DateTime.Now,
+                                    updateDate = DateTime.Now,
+                                    isActive = true,
+                                };
+                                _context.Add(student);
+                                _context.SaveChanges();
+                            }
+                        }
+
+                        if (roleDetails.NormalizedName == "TUTOR")
+                        {
+                            var existingTutor = _context.Tutors.Where(s => s.userId == RoleAssignModel.userId).FirstOrDefault();
+                            if (existingTutor == null)
+                            {
+                                var tutor = new Tutor()
+                                {
+                                    userId = RoleAssignModel.userId,
+                                    createdDate = DateTime.Now,
+                                    updateDate = DateTime.Now,
+                                    isActive= true,
+                                };
+                                _context.Add(tutor);
+                                _context.SaveChanges();
+                            }
+                        }
                         result.Add(currResult);
                     }
 
