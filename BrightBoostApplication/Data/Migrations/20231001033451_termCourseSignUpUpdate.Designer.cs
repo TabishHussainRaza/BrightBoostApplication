@@ -4,6 +4,7 @@ using BrightBoostApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BrightBoostApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231001033451_termCourseSignUpUpdate")]
+    partial class termCourseSignUpUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -438,15 +440,14 @@ namespace BrightBoostApplication.Data.Migrations
                     b.Property<DateTime>("createdDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("fkId")
+                        .HasColumnType("int");
+
                     b.Property<bool?>("isActive")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("updateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

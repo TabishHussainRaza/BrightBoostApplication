@@ -9,6 +9,7 @@
         public DateTime createdDate { get; set; }
         public DateTime updateDate { get; set; }
         public Nullable<bool> isActive { get; set; }
+        public Nullable<int> status { get; set; }
         public IList<TermCourse> TermCourse { get; set; }
     }
 }

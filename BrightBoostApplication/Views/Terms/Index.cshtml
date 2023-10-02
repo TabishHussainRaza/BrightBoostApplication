@@ -198,6 +198,17 @@
                             }
                         },
                         {
+                            title: 'Current Term',
+                            render: function (data, type, row, meta) {
+
+                                var condition = row.status && row.status == 2 ? 'checked' : '';
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<input type='checkbox' class ="change_status" id="${row.id}_chk_status" data-id="${row.id}" ${condition}/>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                        {
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
@@ -547,6 +558,55 @@
                     }
                 });
             }
+            $("#terms").on("click", ".change_status", function (e) {
+                var data = {
+                    id: $(e.target).data('id'),
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to change the term status?",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        data.condition = $(`#${data.id}_chk_status`).prop("checked") ? 2: 1;
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            url: "/Terms/ChangeTermStatus",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'Term Status Updated!',
+                                        text: 'Successfully Updated!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAll();
+                                } else {
+                                    swal({
+                                        title: 'Term Status Change Failed!',
+                                        text: 'Could Not be Changed!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "Term Status Not Updated", "error");
+                    }
+                })
+            });
         });
 
     </script>

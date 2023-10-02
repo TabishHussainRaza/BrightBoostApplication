@@ -52,7 +52,7 @@ namespace BrightBoostApplication.Controllers
             {
                 return Json(new { status = false, message = $"No Term Details Found" });
             }
-            var sessions = _context.Sessions.Where(s=>s.fkId == id && s.isActive == true).ToList();
+            var sessions = _context.Sessions.Where(s=>s.fkId == term.Id && s.isActive == true).ToList();
             return Json(sessions);
         }
 
@@ -78,7 +78,8 @@ namespace BrightBoostApplication.Controllers
                     updateDate=DateTime.Now,
                     fkId = termCourse.Id,
                     TermCourse = termCourse,
-                    MaxNumber = sessionCap
+                    MaxNumber = sessionCap,
+                    currentCap =0
                 };
                 _context.Add(session);
                 await _context.SaveChangesAsync();
@@ -107,7 +108,7 @@ namespace BrightBoostApplication.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Update([FromBody] SessionViewModel updatedSession)
+        public async Task<JsonResult> Update([FromBody] SessionUpdateViewModel updatedSession)
         {
             if (updatedSession.Id == null || _context.Sessions == null)
             {

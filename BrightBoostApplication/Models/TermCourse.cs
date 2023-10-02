@@ -8,5 +8,6 @@
         public int TermId { get; set; }
         public Term Term { get; set; }
         public string Title { get; set; }
+        public IList<StudentCourseSignUp> StudentCourseSignUp { get; set; }
     }
 }

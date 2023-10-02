@@ -208,5 +208,24 @@ namespace BrightBoostApplication.Controllers
                 return Json(new { status = false, message = $"An error occurred: {ex.Message}" });
             }
         }
+
+        [HttpPost]
+        public async Task<JsonResult> ChangeTermStatus(int id, int condition)
+        {
+            if(id == 0)
+            {
+                return Json(false);
+            }
+            var term = _context.Terms.Where(t => t.Id == id).FirstOrDefault();
+            if (term != null)
+            {
+                term.status = condition;
+                await _context.SaveChangesAsync();
+                return Json(true);
+            }
+            return Json(false);
+        }
     }
+
+    
 }

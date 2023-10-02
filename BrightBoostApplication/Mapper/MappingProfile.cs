@@ -11,6 +11,7 @@ namespace BrightBoostApplication.Mapper
         public MappingProfile()
         {
             CreateMap<IdentityRole, RoleModel>().ReverseMap();
+
             CreateMap<TermCourse, TermSubjectViewModel>()
             .ForMember(dest => dest.TermCourseId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.subjectName, opt => opt.MapFrom(src => src.Subject.subjectName))
@@ -20,6 +21,8 @@ namespace BrightBoostApplication.Mapper
             .ForMember(dest => dest.isActive, opt => opt.MapFrom(src => src.Subject.isActive))
             .ForMember(dest => dest.TermCourse, opt => opt.MapFrom(src => src.Subject.TermCourse))
             .ForMember(dest => dest.Expertise, opt => opt.MapFrom(src => src.Subject.Expertise));
+
+            CreateMap<Session, SessionViewModel>().ReverseMap();
         }
     }
 }

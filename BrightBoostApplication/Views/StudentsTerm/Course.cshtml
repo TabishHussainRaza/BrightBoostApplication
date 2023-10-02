@@ -1,0 +1,126 @@
+﻿@model BrightBoostApplication.Models.ViewModel.TermSubjectViewModel
+@{
+    ViewBag.Title = "Student Course";
+    ViewBag.description = "stuTermsCourse";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h2 class="mr-auto">@Model.subjectName</h2>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>Course Introduction</h3>
+                    <p>Welcome to <b>@Model.subjectName</b></p>
+                    <p>@Model.subjectDescription</p>
+                    <br />
+                    <h3>Sessions</h3>
+                    <p>Using the following link signup for one session for this course</p>
+                    <a href="/StudentsTerm/CourseSession?id=@Model.TermCourseId" class="btn-icon-split btn-sm btn btn-secondary">
+                        <span class="icon text-white-50" style='color: white'><i class='fa fa-plus' style='color: white'></i> Unit Session</span>
+                    </a>
+                     <br />
+                    <br />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<br />
+
+<div class="modal fade" id="assignModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Register Subjects</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Subjects</label>
+                    <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
+                </div>
+                <input type="hidden" id="student_id" value="@Model.Id"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAddSubjectsRegistration">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var DataTable = null;
+
+            function getAll() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: `/StudentsTerm/MyRegistrations?id=${@Model.Id}`,
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result) {
+                            if (DataTable == null) {
+                                initializeDataTable(result);
+                            } else {
+                                updateDataTable(result);
+                            }
+                        } else {
+                            console.log("No Items found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function updateDataTable(updatedData) {
+                DataTable.clear().rows.add(updatedData).draw();
+            }
+
+            function initializeDataTable(data) {
+                DataTable = $(`#@ViewBag.description`).DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Subject name',
+                            data: 'subjectName'
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<a href="/Sessions?id=${row?.termCourseId}" class="btn-icon-split btn-sm btn btn-secondary js-update" data-id="${row?.termCourseId}">
+                                                        <span class="icon text-white-50" data-id="${row?.termCourseId}"><i class='fa fa-eye' style='color: white' data-id="${row?.termCourseId}"></i></span>
+                                                                                </a>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+
+            getAll();
+
+        });
+
+    </script>
+}

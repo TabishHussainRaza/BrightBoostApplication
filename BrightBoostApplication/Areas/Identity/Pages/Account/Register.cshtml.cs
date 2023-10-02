@@ -20,17 +20,21 @@ namespace BrightBoostApplication.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
+        private RoleManager<IdentityRole>? roleManager;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender, ApplicationDbContext context, RoleManager<IdentityRole> roleMgr)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
+            roleManager = roleMgr;
         }
 
         [BindProperty]
@@ -84,6 +88,34 @@ namespace BrightBoostApplication.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+                    var student = new Student()
+                    {
+                        userId= user.Id,
+                        createdDate = DateTime.Now,
+                        updateDate = DateTime.Now,
+                        isActive = true,
+                    };
+                    _context.Add(student);
+                    _context.SaveChanges();
+
+                    var roleDetails = await roleManager.FindByNameAsync("Student");
+                    if (roleDetails != null)
+                    {
+                        var currResult = await _userManager.AddToRoleAsync(user, roleDetails.Name);
+                        if (currResult.Succeeded)
+                        {
+                            if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                            {
+                                return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                            }
+                            else
+                            {
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+                                return LocalRedirect(returnUrl);
+                            }
+
+                        }
+                    }
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
@@ -93,6 +125,7 @@ namespace BrightBoostApplication.Areas.Identity.Pages.Account
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
+
                 }
                 foreach (var error in result.Errors)
                 {

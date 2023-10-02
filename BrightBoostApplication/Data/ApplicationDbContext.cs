@@ -21,6 +21,8 @@ namespace BrightBoostApplication.Data
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<StudentSignUp> StudentSignUps { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<StudentCourseSignUp> StudentCourseSignUps { get; set; }
+        public DbSet<Expertise> Expertise { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
