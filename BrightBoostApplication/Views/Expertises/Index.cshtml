@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "Expertise Management";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">My Profile</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-eye' style='color: white'></i> Expertise</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="exp" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">My Expertise</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="mb-3">
+                        <label for="select_item_list" class="form-label">Subjects</label>
+                        <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
+                    </div>
+                </div>          
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary addItem" id="btnSaveitem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="availabilityModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Availability</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="days">Select Days:</label>
+                    <select id="days" class="days-dropdown" multiple>
+                        <option value="monday">Monday</option>
+                        <option value="tuesday">Tuesday</option>
+                        <option value="wednesday">Wednesday</option>
+                        <option value="thursday">Thursday</option>
+                        <option value="friday">Friday</option>
+                    </select>
+                </div>
+                <input type="hidden" class="form-control" id="addSubjectId" name="addSubjects">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAddSubjects">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Get all Expertises 
+            // For each expertise we will add the availability
+
+
+            $('#addNew').on('click', function (e) {
+                //Get all subjects then show modal
+                $('#addNewModal').modal('show');
+            });
+
+            $('#btnSaveitem').on('click', function (e) {
+                //Call AJAX to add the Expertise
+            });            
+        });
+
+    </script>
+}
