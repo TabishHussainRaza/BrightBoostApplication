@@ -7,5 +7,6 @@
         public Student Student { get; set; }
         public int termCourseId { get; set; }
         public TermCourse TermCourse { get; set; }
+        public DateTime? createDate { get; set; }
     }
 }

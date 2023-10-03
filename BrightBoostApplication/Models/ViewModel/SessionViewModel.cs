@@ -2,6 +2,7 @@
 {
     public class SessionViewModel :Session
     {
+        public int? SignUpCount { get; set; }
     }
 
     public class SessionUpdateViewModel

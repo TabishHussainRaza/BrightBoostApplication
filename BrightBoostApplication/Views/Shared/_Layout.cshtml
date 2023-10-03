@@ -52,6 +52,12 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
                         {
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "AdminDashboard")" class="nav-link @((controller.Equals("AdminDashboard") ) ? "active" : "")">
+                                    <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
                             <li class="nav-item @(((new[] { "User", "Role", "Terms", "Subjects", "TermCourses", "Sessions" }.Contains(controller)) && action.Equals("Index")) ? "menu-is-opening menu-open" : "")">
                                 <a href="#" class="nav-link @(((new[] { "User", "Role", "Terms", "Subjects", "TermCourses", "Sessions" }.Contains(controller)) && action.Equals("Index")) ? "active" : "")">
                                     <i class="nav-icon fas fa-cogs"></i>
@@ -88,13 +94,19 @@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a href="@Url.Action("Dashboard", "StudentsTerm")" class="nav-link">
+                                <a href="@Url.Action("Timetable", "StudentsTerm")" class="nav-link @((controller.Equals("StudentsTerm") && action.Equals("Timetable")) ? "active" : "")">
+                                    <i class="fas fa-dashboard fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Timetable</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Dashboard", "StudentsTerm")" class="nav-link @((controller.Equals("StudentsTerm") && action.Equals("Dashboard")) ? "active" : "")">
                                     <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>Dashboard</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="@Url.Action("Index", "StudentsTerm")" class="nav-link">
+                                <a href="@Url.Action("Index", "StudentsTerm")" class="nav-link @((controller.Equals("StudentsTerm") && action.Equals("Index") ) ? "active" : "")">
                                     <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>Register</p>
                                 </a>
@@ -104,13 +116,19 @@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Tutor"))
                         {
                             <li class="nav-item">
-                                <a href="@Url.Action("Dashboard", "Tutors")" class="nav-link">
+                                <a href="@Url.Action("Timetable", "Expertises")" class="nav-link @((controller.Equals("Expertises") && action.Equals("TimeTable")) ? "active" : "")">
+                                    <i class="fas fa-dashboard fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Timetable</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Dashboard", "Tutors")" class="nav-link @((controller.Equals("Tutors") ) ? "active" : "")">
                                     <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>Dashboard</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="@Url.Action("Index", "Expertises")" class="nav-link">
+                                <a href="@Url.Action("Index", "Expertises")" class="nav-link @((controller.Equals("Expertises") && action.Equals("Index")) ? "active" : "")">
                                     <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>My Profile</p>
                                 </a>

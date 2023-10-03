@@ -1,0 +1,139 @@
+﻿@model BrightBoostApplication.Models.ViewModel.StatisticsViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@Model.TotalUsers</h3>
+                        <p>Total Users</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@Model.TotalStudents</h3>
+                        <p>Total Students</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-person"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@Model.TotalCourseRegistrations</h3>
+                        <p>Course Registrations</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@Model.TotalSessionRegistrations</h3>
+                        <p>Sessions Registrations</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-codepen"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header ui-sortable-handle" style="cursor: move;">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie mr-1"></i>
+                                Course Registration Trend
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="courseRegistrationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header ui-sortable-handle" style="cursor: move;">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie mr-1"></i>
+                                Questions Trend
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="questionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+         </div>
+    </div>
+</section>
+
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        var chartData = @Html.Raw(Json.Serialize(@Model.registrationData));
+        var ctx = document.getElementById('courseRegistrationsChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map(function (item) { return item.month; }),
+                datasets: [{
+                    label: 'Course Registrations',
+                    data: chartData.map(function (item) { return item.registrations; }),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var chartQData = @Html.Raw(Json.Serialize(@Model.QuestionStat));
+
+        var nCtx = document.getElementById('questionChart').getContext('2d');
+        var chart = new Chart(nCtx, {
+            type: 'line',
+            data: {
+                labels: chartQData.map(function (item) { return item.month; }),
+                datasets: [{
+                    label: 'Questions',
+                    data: chartQData.map(function (item) { return item.total; }),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+}

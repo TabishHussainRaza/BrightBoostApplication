@@ -12,7 +12,7 @@ using BrightBoostApplication.Models.ViewModel;
 
 namespace BrightBoostApplication.Controllers
 {
-//    [Authorize]
+    [Authorize]
     public class SessionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -52,7 +52,14 @@ namespace BrightBoostApplication.Controllers
             {
                 return Json(new { status = false, message = $"No Term Details Found" });
             }
-            var sessions = _context.Sessions.Where(s=>s.fkId == term.Id && s.isActive == true).ToList();
+            var sessions = _context.Sessions.Where(s=>s.fkId == term.Id && s.isActive == true).Select(tc => new SessionViewModel
+            {
+                SessionName = tc.SessionName,
+                SessionDay = tc.SessionDay,
+                SessionVenue = tc.SessionVenue,
+                Id = tc.Id,
+                SignUpCount = _context.StudentSignUps.Where(s => s.SessionId == tc.Id).Count(),
+            }).ToList();
             return Json(sessions);
         }
 
