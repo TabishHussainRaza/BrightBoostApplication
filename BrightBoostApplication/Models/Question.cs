@@ -8,8 +8,8 @@
         public string answer { get; set; }
         public DateTime createdDate { get; set; }
         public DateTime updateDate { get; set; }
-        public Nullable<bool> status { get; set; }
-        public int order { get; set; }
+        public Nullable<bool> status { get; set; } = false;
+        public int order { get; set; } = 0;
         public int StudentSignUpId { get; set; }
         public StudentSignUp StudentSignUp { get; set; }
     }
