@@ -83,7 +83,7 @@ namespace BrightBoostApplication.Controllers
             return Json(new { success = true, questions = myQuestions });
         }
         
-        [HttpGet("{id}")]
+        [HttpGet("StudentQuestions/{id}")]
         public async Task<JsonResult> Details(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -144,7 +144,7 @@ namespace BrightBoostApplication.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("StudentQuestions/{id}")]
         public async Task<JsonResult> UpdateQuestion(int id, [FromBody] StudentQuestionUpdateViewModel model)
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -188,7 +188,7 @@ namespace BrightBoostApplication.Controllers
             }
         }
         
-        [HttpDelete("{id}")]
+        [HttpDelete("StudentQuestions/{id}")]
         public async Task<JsonResult> DeleteQuestion(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
