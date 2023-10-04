@@ -37,13 +37,51 @@ namespace BrightBoostApplication.Controllers
         [HttpGet]
         public async Task<JsonResult> GetAllMyQuestionsAsync()
         {
-            var currentUser = await _userManager.GetUserAsync(User);
+            // TODO just for debugging, remember to change back 
+            // var currentUser = await _userManager.GetUserAsync(User);
+            //
+            // if (currentUser == null)
+            // {
+            //     return Json(new { success = false, message = "User not found." });
+            // }
 
-            if (currentUser == null)
-            {
-                return Json(new { success = false, message = "User not found." });
-            }
-
+            // var myQuestions = await _context.Questions
+            //     .Join(
+            //         _context.StudentSignUps,
+            //         q => q.StudentSignUpId,
+            //         ss => ss.Id,
+            //         (q, ss) => new { q, ss }
+            //     )
+            //     .Join(
+            //         _context.Student,
+            //         x => x.ss.StudentId,
+            //         st => st.Id,
+            //         (x, st) => new { x.q, x.ss, st }
+            //     )
+            //     .Join(
+            //         _context.Sessions,
+            //         x => x.ss.SessionId,
+            //         se => se.Id,
+            //         (x, se) => new { x.q, x.ss, x.st, se }
+            //     )
+            //     .Where(x => x.st.userId == currentUser.Id)
+            //     .Select(
+            //         tmp => new
+            //         {
+            //             tmp.q.id,
+            //             tmp.q.title,
+            //             tmp.q.description,
+            //             tmp.q.answer,
+            //             tmp.q.createdDate,
+            //             tmp.q.updateDate,
+            //             tmp.q.status,
+            //             tmp.q.order,
+            //             tmp.se.SessionName
+            //         }
+            //     )
+            //     .ToListAsync();
+            
+            // TODO just for debugging, remember to delete these code
             var myQuestions = await _context.Questions
                 .Join(
                     _context.StudentSignUps,
@@ -63,7 +101,6 @@ namespace BrightBoostApplication.Controllers
                     se => se.Id,
                     (x, se) => new { x.q, x.ss, x.st, se }
                 )
-                .Where(x => x.st.userId == currentUser.Id)
                 .Select(
                     tmp => new
                     {
@@ -86,19 +123,27 @@ namespace BrightBoostApplication.Controllers
         [HttpGet("StudentQuestions/{id}")]
         public async Task<JsonResult> Details(int id)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
+            // TODO just for debugging, remember to change back 
+            // var currentUser = await _userManager.GetUserAsync(User);
+            //
+            // if (currentUser == null)
+            // {
+            //     return Json(new { success = false, message = "User not found." });
+            // }
 
-            if (currentUser == null)
-            {
-                return Json(new { success = false, message = "User not found." });
-            }
-
+            // var myQuestion = await _context.Questions
+            //     .FirstOrDefaultAsync(
+            //         q => q.id == id &&
+            //              q.StudentSignUp != null &&
+            //              q.StudentSignUp.Student.userId == currentUser.Id
+            //     );
+            
+            // TODO just for debugging, remember to delete these code
             var myQuestion = await _context.Questions
                 .FirstOrDefaultAsync(
-                    q => q.id == id &&
-                         q.StudentSignUp != null &&
-                         q.StudentSignUp.Student.userId == currentUser.Id
+                    q => q.id == id
                 );
+            
             if (myQuestion == null)
             {
                 return Json(new { success = false, message = "Question not found or you don't have permission to view." });
@@ -110,12 +155,13 @@ namespace BrightBoostApplication.Controllers
         [HttpPost]
         public async Task<JsonResult> Create([FromBody] StudentQuestionCreateViewModel model)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser == null)
-            {
-                return Json(new { success = false, message = "User not found." });
-            }
+            // TODO just for debugging, remember to change back
+            // var currentUser = await _userManager.GetUserAsync(User);
+            //
+            // if (currentUser == null)
+            // {
+            //     return Json(new { success = false, message = "User not found." });
+            // }
 
             if (model == null)
             {
@@ -147,18 +193,27 @@ namespace BrightBoostApplication.Controllers
         [HttpPut("StudentQuestions/{id}")]
         public async Task<JsonResult> UpdateQuestion(int id, [FromBody] StudentQuestionUpdateViewModel model)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
+            // TODO just for debugging, remember to change back 
+            // var currentUser = await _userManager.GetUserAsync(User);
+            //
+            // if (currentUser == null)
+            // {
+            //     return Json(new { success = false, message = "User not found." });
+            // }
+            
+            // var existingQuestion = await _context.Questions
+            //     .FirstOrDefaultAsync(
+            //         q => q.id == id &&
+            //              q.StudentSignUp != null &&
+            //              q.StudentSignUp.Student.userId == currentUser.Id &&
+            //              (q.status == false || q.status == null)
+            //     );
 
-            if (currentUser == null)
-            {
-                return Json(new { success = false, message = "User not found." });
-            }
 
+            // TODO just for debugging, remember to delete these code
             var existingQuestion = await _context.Questions
                 .FirstOrDefaultAsync(
                     q => q.id == id &&
-                         q.StudentSignUp != null &&
-                         q.StudentSignUp.Student.userId == currentUser.Id &&
                          (q.status == false || q.status == null)
                          );
 
@@ -191,20 +246,28 @@ namespace BrightBoostApplication.Controllers
         [HttpDelete("StudentQuestions/{id}")]
         public async Task<JsonResult> DeleteQuestion(int id)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
+            // TODO just for debugging, remember to change back
+            // var currentUser = await _userManager.GetUserAsync(User);
+            //
+            // if (currentUser == null)
+            // {
+            //     return Json(new { success = false, message = "User not found." });
+            // }
 
-            if (currentUser == null)
-            {
-                return Json(new { success = false, message = "User not found." });
-            }
-
+            // var existingQuestion = await _context.Questions
+            //     .FirstOrDefaultAsync(
+            //         q => q.id == id &&
+            //              q.StudentSignUp != null &&
+            //              q.StudentSignUp.Student.userId == currentUser.Id &&
+            //              (q.status == false || q.status == null)
+            //              );
+            
+            // TODO just for debugging, remember to delete these code
             var existingQuestion = await _context.Questions
                 .FirstOrDefaultAsync(
                     q => q.id == id &&
-                         q.StudentSignUp != null &&
-                         q.StudentSignUp.Student.userId == currentUser.Id &&
                          (q.status == false || q.status == null)
-                         );
+                );
 
             if (existingQuestion == null)
             {
