@@ -34,7 +34,7 @@ namespace BrightBoostApplication.Controllers
                 Problem("Entity set 'ApplicationDbContext.Questions' is null.");
         }
         
-        [HttpGet]
+        [HttpGet("StudentQuestions/GetAllMyQuestions")]
         public async Task<JsonResult> GetAllMyQuestionsAsync()
         {
             // TODO just for debugging, remember to change back 
@@ -120,7 +120,7 @@ namespace BrightBoostApplication.Controllers
             return Json(new { success = true, questions = myQuestions });
         }
         
-        [HttpGet("StudentQuestions/{id}")]
+        [HttpGet("StudentQuestions/Details/{id}")]
         public async Task<JsonResult> Details(int id)
         {
             // TODO just for debugging, remember to change back 
