@@ -83,36 +83,17 @@ namespace BrightBoostApplication.Controllers
             
             // TODO just for debugging, remember to delete these code
             var myQuestions = await _context.Questions
-                .Join(
-                    _context.StudentSignUps,
-                    q => q.StudentSignUpId,
-                    ss => ss.Id,
-                    (q, ss) => new { q, ss }
-                )
-                .Join(
-                    _context.Student,
-                    x => x.ss.StudentId,
-                    st => st.Id,
-                    (x, st) => new { x.q, x.ss, st }
-                )
-                .Join(
-                    _context.Sessions,
-                    x => x.ss.SessionId,
-                    se => se.Id,
-                    (x, se) => new { x.q, x.ss, x.st, se }
-                )
                 .Select(
                     tmp => new
                     {
-                        tmp.q.id,
-                        tmp.q.title,
-                        tmp.q.description,
-                        tmp.q.answer,
-                        tmp.q.createdDate,
-                        tmp.q.updateDate,
-                        tmp.q.status,
-                        tmp.q.order,
-                        tmp.se.SessionName
+                        tmp.id,
+                        tmp.title,
+                        tmp.description,
+                        tmp.answer,
+                        tmp.createdDate,
+                        tmp.updateDate,
+                        tmp.status,
+                        tmp.order
                     }
                 )
                 .ToListAsync();
@@ -140,6 +121,19 @@ namespace BrightBoostApplication.Controllers
             
             // TODO just for debugging, remember to delete these code
             var myQuestion = await _context.Questions
+                .Select(
+                    tmp => new
+                    {
+                        tmp.id,
+                        tmp.title,
+                        tmp.description,
+                        tmp.answer,
+                        tmp.createdDate,
+                        tmp.updateDate,
+                        tmp.status,
+                        tmp.order
+                    }
+                )
                 .FirstOrDefaultAsync(
                     q => q.id == id
                 );
