@@ -181,6 +181,45 @@ namespace BrightBoostApplication.Controllers
             return Json(new { success = true, question = studentQuestion });
         }
         
+        [HttpPost]
+        public async Task<JsonResult> Create([FromBody] TutorQuestionCreateViewModel model)
+        {
+            // TODO just for debugging, remember to change back
+            // var currentUser = await _userManager.GetUserAsync(User);
+            //
+            // if (currentUser == null)
+            // {
+            //     return Json(new { success = false, message = "User not found." });
+            // }
+
+            if (model == null)
+            {
+                return Json(new { success = false, message = "Invalid data received." });
+            }
+
+            try
+            {
+                var newQuestion = new Question
+                {
+                    title = model.Title,
+                    description = model.Description,
+                    answer = model.Answer,
+                    createdDate = DateTime.Now,
+                    updateDate = DateTime.Now,
+                    StudentSignUpId = model.StudentSignUpId
+                };
+
+                _context.Questions.Add(newQuestion);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Question created successfully." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+        
         [HttpPut("TutorQuestions/{id}")]
         public async Task<JsonResult> UpdateQuestionAsync(int id, [FromBody] TutorQuestionUpdateViewModel model)
         {
