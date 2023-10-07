@@ -354,16 +354,11 @@
             $('#btnSaveitem').on('click', function (e) {
                 if (!validateForm()) {
                     return;
-                } else {
-                    //    var data={
-                    //                 Title:"fake question",
-                    //                 Description:"fake descrption",
-                    //                 StudentSignUpId:1
-                    //             }   
+                } else { 
                     var data = {
                         Title: $("#question_title").val(),
                         Description: $("#description").val(),
-                        StudentSignUpId: 1
+                        StudentSignUpId: 1   // TODO TutorAllocationId can not be fiexed value
                     };
                     data = JSON.stringify(data)
                     $.ajax({

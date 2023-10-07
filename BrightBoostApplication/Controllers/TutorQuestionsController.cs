@@ -14,7 +14,7 @@ using ServiceStack;
 
 namespace BrightBoostApplication.Controllers
 {
-    // [Authorize(Roles ="Tutor")]
+    [Authorize(Roles ="Tutor")]
     public class TutorQuestionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -37,71 +37,60 @@ namespace BrightBoostApplication.Controllers
         [HttpGet("TutorQuestions/GetAllMySessionQuestions")]
         public async Task<JsonResult> GetAllMySessionQuestionsAsync()
         {
-            // TODO just for debugging, remember to change back 
-            // var currentUser = await _userManager.GetUserAsync(User);
-            //
-            // if (currentUser == null)
-            // {
-            //     return Json(new { success = false, message = "User not found." });
-            // }
+            var currentUser = await _userManager.GetUserAsync(User);
+            
+            if (currentUser == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+            
+            var tutor = _context.Tutors.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (tutor == null)
+            {
+                return Json(new { success = false, message = "Tutor not found." });
+            }
 
+            var sessionIds = _context.TutorAllocations
+                .Where(ta => ta.TutorId == tutor.Id)
+                .Select(ta => ta.SessionId).ToList();
+            
             try
             {
-                // var allQuestions = await _context.Questions
-                //     .Join(
-                //         _context.StudentSignUps,
-                //         q => q.StudentSignUpId,
-                //         ss => ss.Id,
-                //         (q, ss) => new { q, ss }
-                //     )
-                //     .Join(
-                //         _context.Sessions,
-                //         tmp => tmp.ss.SessionId,
-                //         s => s.Id,
-                //         (tmp, s) => new { tmp.q, tmp.ss, s }
-                //     )
-                //     .Join(
-                //         _context.TutorAllocations,
-                //         tmp => tmp.s.Id,
-                //         ta => ta.SessionId,
-                //         (tmp, ta) => new { tmp.q, tmp.ss, tmp.s, ta }
-                //     )
-                //     .Join(
-                //         _context.Tutors,
-                //         tmp => tmp.ta.TutorId,
-                //         t => t.Id,
-                //         (tmp, t) => new { tmp.q, tmp.ss, tmp.s, tmp.ta, t }
-                //     )
-                //     .Where(tmp => tmp.t.userId == currentUser.Id)
-                //     .Select(
-                //         tmp => new
-                //         {
-                //             tmp.q.id,
-                //             tmp.q.title,
-                //             tmp.q.description,
-                //             tmp.q.answer,
-                //             tmp.q.createdDate,
-                //             tmp.q.updateDate,
-                //             tmp.q.status,
-                //             tmp.q.order,
-                //             tmp.s.SessionName
-                //         }
-                //     )
-                //     .ToListAsync();
-                
-                // TODO just for debugging, remember to delete these code
                 var allQuestions = await _context.Questions
+                    .GroupJoin(
+                        _context.StudentSignUps, 
+                        q => q.StudentSignUpId,
+                        ss => ss.Id,
+                        (q, ss) => new { q, ss }
+                    )
+                    .SelectMany(
+                        x => x.ss.DefaultIfEmpty(),
+                        (x, ss) => new { x.q, ss }  
+                    )
+                    .GroupJoin(
+                        _context.TutorAllocations,
+                        x => x.q.TutorAllocationId, 
+                        t => t.Id,
+                        (x, t) => new { x.q, x.ss, t }
+                    )
+                    .SelectMany(
+                        x => x.t.DefaultIfEmpty(),
+                        (x, t) => new { x.q, x.ss, t }
+                    )
+                    .Where(
+                        tmp => (tmp.ss != null && sessionIds.Contains(tmp.ss.SessionId)) ||
+                               (tmp.t != null && sessionIds.Contains(tmp.t.SessionId))
+                    )
                     .Select(
-                        q => new
-                        {
-                            q.id,
-                            q.title,
-                            q.description,
-                            q.answer,
-                            q.createdDate,
-                            q.updateDate,
-                            q.status,
-                            q.order
+                        tmp => new {
+                            tmp.q.id,
+                            tmp.q.title,
+                            tmp.q.description,
+                            tmp.q.answer,
+                            tmp.q.createdDate,
+                            tmp.q.updateDate, 
+                            tmp.q.status,
+                            tmp.q.order
                         }
                     )
                     .ToListAsync();
@@ -117,80 +106,75 @@ namespace BrightBoostApplication.Controllers
         [HttpGet("TutorQuestions/Details/{id}")]
         public async Task<JsonResult> Details(int id)
         {
-            // TODO just for debugging, remember to change back 
-            // var currentUser = await _userManager.GetUserAsync(User);
-            //
-            // if (currentUser == null)
-            // {
-            //     return Json(new { success = false, message = "User not found." });
-            // }
-
-            // var studentQuestion = await _context.Questions
-            //     .Join(
-            //         _context.StudentSignUps,
-            //         q => q.StudentSignUpId,
-            //         ss => ss.Id,
-            //         (q, ss) => new { q, ss }
-            //     )
-            //     .Join(
-            //         _context.Sessions,
-            //         tmp => tmp.ss.SessionId,
-            //         s => s.Id,
-            //         (tmp, s) => new { tmp.q, tmp.ss, s }
-            //     )
-            //     .Join(
-            //         _context.TutorAllocations,
-            //         tmp => tmp.s.Id,
-            //         ta => ta.SessionId,
-            //         (tmp, ta) => new { tmp.q, tmp.ss, tmp.s, ta }
-            //     )
-            //     .Join(
-            //         _context.Tutors,
-            //         tmp => tmp.ta.TutorId,
-            //         t => t.Id,
-            //         (tmp, t) => new { tmp.q, tmp.ss, tmp.s, tmp.ta, t }
-            //     )
-            //     .Where(
-            //         tmp => tmp.q.id == id &&
-            //                tmp.t.userId == currentUser.Id
-            //                )
-            //     .Select(x => x.q)
-            //     .FirstOrDefaultAsync();
+            var currentUser = await _userManager.GetUserAsync(User);
             
-            // TODO just for debugging, remember to delete these code
+            if (currentUser == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+            
+            var tutor = _context.Tutors.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (tutor == null)
+            {
+                return Json(new { success = false, message = "Tutor not found." });
+            }
+            
             var studentQuestion = await _context.Questions
-                .Select(
-                    tmp => new
-                    {
-                        tmp.id,
-                        tmp.title,
-                        tmp.description,
-                        tmp.answer,
-                        tmp.createdDate,
-                        tmp.updateDate,
-                        tmp.status,
-                        tmp.order
-                    }
-                )
-                .FirstOrDefaultAsync(q => q.id == id);
+                .Where(q => q.id == id).FirstOrDefaultAsync();
             if (studentQuestion == null)
             {
-                return Json(new { success = false, message = "Question not found or you don't have permission to view." });
+                return Json(new { success = false, message = "Question not found." });
             }
 
+            if (studentQuestion.StudentSignUpId != null)
+            {
+                if (studentQuestion.StudentSignUp == null)
+                {
+                    return Json(new { success = false, message = "Question StudentSignUp doesn't exist." });
+                }
+                bool isMySessionQuestion = _context.TutorAllocations
+                    .Any(
+                        ta => ta.TutorId == tutor.Id &&
+                              ta.SessionId == studentQuestion.StudentSignUp.SessionId
+                    );
+                if (!isMySessionQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to view the Question which not belongs to your session." }
+                    );
+                }
+            }
+            
+            if (studentQuestion.TutorAllocationId != null)
+            {
+                if (studentQuestion.TutorAllocation == null)
+                {
+                    return Json(new { success = false, message = "Question TutorAllocation doesn't exist." });
+                }
+                bool isMySessionQuestion = _context.TutorAllocations
+                    .Any(
+                        ta => ta.TutorId == tutor.Id &&
+                              ta.SessionId == studentQuestion.TutorAllocation.SessionId
+                    );
+                if (!isMySessionQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to view the Question which not belongs to your session." }
+                    );
+                }
+            }
             return Json(new { success = true, question = studentQuestion });
         }
         
         [HttpPost]
         public async Task<JsonResult> Create([FromBody] TutorQuestionCreateViewModel model)
         {
-            // TODO just for debugging, remember to change back
-            // var currentUser = await _userManager.GetUserAsync(User);
-            //
-            // if (currentUser == null)
-            // {
-            //     return Json(new { success = false, message = "User not found." });
-            // }
+            var currentUser = await _userManager.GetUserAsync(User);
+            
+            if (currentUser == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
 
             if (model == null)
             {
@@ -206,7 +190,7 @@ namespace BrightBoostApplication.Controllers
                     answer = model.Answer,
                     createdDate = DateTime.Now,
                     updateDate = DateTime.Now,
-                    StudentSignUpId = model.StudentSignUpId
+                    TutorAllocationId = model.TutorAllocationId
                 };
 
                 _context.Questions.Add(newQuestion);
@@ -223,62 +207,66 @@ namespace BrightBoostApplication.Controllers
         [HttpPut("TutorQuestions/{id}")]
         public async Task<JsonResult> UpdateQuestionAsync(int id, [FromBody] TutorQuestionUpdateViewModel model)
         {
-            // TODO just for debugging, remember to change back 
-            // var currentUser = await _userManager.GetUserAsync(User);
-            //
-            // if (currentUser == null)
-            // {
-            //     return Json(new { success = false, message = "User not found." });
-            // }
+            var currentUser = await _userManager.GetUserAsync(User);
+            
+            if (currentUser == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+            
+            var tutor = _context.Tutors.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (tutor == null)
+            {
+                return Json(new { success = false, message = "Tutor not found." });
+            }
+            
+            var questionToUpdate = await _context.Questions.FirstOrDefaultAsync(q => q.id == id);
+            if (questionToUpdate == null)
+            {
+                return Json(new { success = false, message = "Question not found." });
+            }
+            
+            if (questionToUpdate.status == true)
+            {
+                return Json(new { success = false, message = "Question has been checked." });
+            }
+
+            if (questionToUpdate.StudentSignUpId != null)
+            {
+                if (questionToUpdate.StudentSignUp == null)
+                {
+                    return Json(new { success = false, message = "Question StudentSignUp doesn't exist." });
+                }
+                bool isMySessionQuestion = _context.TutorAllocations
+                    .Any(
+                        ta => ta.TutorId == tutor.Id &&
+                              ta.SessionId == questionToUpdate.StudentSignUp.SessionId
+                    );
+                if (!isMySessionQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to answer the Question which not belongs to your session." }
+                    );
+                }
+            }
+            
+            if (questionToUpdate.TutorAllocationId != null)
+            {
+                if (questionToUpdate.TutorAllocation == null)
+                {
+                    return Json(new { success = false, message = "Question TutorAllocation doesn't exist." });
+                }
+                bool isMyQuestion = questionToUpdate.TutorAllocation.TutorId == tutor.Id;
+                if (!isMyQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to answer the Question created by another tutor." }
+                    );
+                }
+            }
 
             try
             {
-                // var questionToUpdate = await _context.Questions
-                //     .Join(
-                //         _context.StudentSignUps,
-                //         q => q.StudentSignUpId,
-                //         ss => ss.Id,
-                //         (q, ss) => new { q, ss }
-                //     )
-                //     .Join(
-                //         _context.Sessions,
-                //         tmp => tmp.ss.SessionId,
-                //         s => s.Id,
-                //         (tmp, s) => new { tmp.q, tmp.ss, s }
-                //     )
-                //     .Join(
-                //         _context.TutorAllocations,
-                //         tmp => tmp.s.Id,
-                //         ta => ta.SessionId,
-                //         (tmp, ta) => new { tmp.q, tmp.ss, tmp.s, ta }
-                //     )
-                //     .Join(
-                //         _context.Tutors,
-                //         tmp => tmp.ta.TutorId,
-                //         t => t.Id,
-                //         (tmp, t) => new { tmp.q, tmp.ss, tmp.s, tmp.ta, t }
-                //     )
-                //     .Where(
-                //         tmp => tmp.q.id == id &&
-                //                tmp.t.userId == currentUser.Id &&
-                //                (tmp.q.status == false || tmp.q.status == null)
-                //     )
-                //     .Select(x => x.q)
-                //     .FirstOrDefaultAsync();
-                
-                // TODO just for debugging, remember to delete these code
-                var questionToUpdate = await _context.Questions
-                    .Where(
-                        tmp => tmp.id == id &&
-                               (tmp.status == false || tmp.status == null)
-                    )
-                    .FirstOrDefaultAsync();
-
-                if (questionToUpdate == null)
-                {
-                    return Json(new { success = false, message = "Question not found or cannot be updated." });
-                }
-
                 // Update only the answer
                 questionToUpdate.answer = model.Answer;
                 questionToUpdate.updateDate = DateTime.Now;
@@ -296,63 +284,53 @@ namespace BrightBoostApplication.Controllers
         [HttpDelete("TutorQuestions/{id}")]
         public async Task<JsonResult> DeleteQuestionAsync(int id)
         {
-            // TODO just for debugging, remember to change back 
-            // var currentUser = await _userManager.GetUserAsync(User);
-            //
-            // if (currentUser == null)
-            // {
-            //     return Json(new { success = false, message = "User not found." });
-            // }
-
-            // var existingQuestion = await _context.Questions
-            //     .Join(
-            //         _context.StudentSignUps,
-            //         q => q.StudentSignUpId,
-            //         ss => ss.Id,
-            //         (q, ss) => new { q, ss }
-            //     )
-            //     .Join(
-            //         _context.Sessions,
-            //         tmp => tmp.ss.SessionId,
-            //         s => s.Id,
-            //         (tmp, s) => new { tmp.q, tmp.ss, s }
-            //     )
-            //     .Join(
-            //         _context.TutorAllocations,
-            //         tmp => tmp.s.Id,
-            //         ta => ta.SessionId,
-            //         (tmp, ta) => new { tmp.q, tmp.ss, tmp.s, ta }
-            //     )
-            //     .Join(
-            //         _context.Tutors,
-            //         tmp => tmp.ta.TutorId,
-            //         t => t.Id,
-            //         (tmp, t) => new { tmp.q, tmp.ss, tmp.s, tmp.ta, t }
-            //     )
-            //     .Where(
-            //         tmp => tmp.q.id == id &&
-            //                tmp.t.userId == currentUser.Id &&
-            //                (tmp.q.status == false || tmp.q.status == null)
-            //     )
-            //     .Select(x => x.q)
-            //     .FirstOrDefaultAsync();
+            var currentUser = await _userManager.GetUserAsync(User);
             
-            // TODO just for debugging, remember to delete these code
-            var existingQuestion = await _context.Questions
-                .Where(
-                    tmp => tmp.id == id &&
-                           (tmp.status == false || tmp.status == null)
-                )
-                .FirstOrDefaultAsync();
-
-            if (existingQuestion == null)
+            if (currentUser == null)
             {
-                return Json(new { success = false, message = "Question not found or you don't have permission to delete." });
+                return Json(new { success = false, message = "User not found." });
+            }
+            
+            var tutor = _context.Tutors.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (tutor == null)
+            {
+                return Json(new { success = false, message = "Tutor not found." });
+            }
+            
+            var questionToDelete = await _context.Questions.FirstOrDefaultAsync(q => q.id == id);
+            if (questionToDelete == null)
+            {
+                return Json(new { success = false, message = "Question not found." });
+            }
+            
+            if (questionToDelete.status == true)
+            {
+                return Json(new { success = false, message = "Question has been checked." });
+            }
+
+            if (questionToDelete.StudentSignUpId != null)
+            {
+                return Json(new { success = false, message = "No permission to delete students' Question." });
+            }
+            
+            if (questionToDelete.TutorAllocationId != null)
+            {
+                if (questionToDelete.TutorAllocation == null)
+                {
+                    return Json(new { success = false, message = "Question TutorAllocation doesn't exist." });
+                }
+                bool isMyQuestion = questionToDelete.TutorAllocation.TutorId == tutor.Id;
+                if (!isMyQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to delete the Question created by another tutor." }
+                    );
+                }
             }
 
             try
             {
-                _context.Questions.Remove(existingQuestion);
+                _context.Questions.Remove(questionToDelete);
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, message = "Question deleted successfully." });
@@ -363,71 +341,75 @@ namespace BrightBoostApplication.Controllers
             }
         }
         
-        [HttpPost]
-        public async Task<JsonResult> BatchUpdateStatusAsync([FromBody] List<int> questionIds)
+        [HttpPut("TutorQuestions/UpdateStatus/{id}")]
+        public async Task<JsonResult> UpdateStatusAsync(int id)
         {
-            // TODO just for debugging, remember to change back
-            // var currentUser = await _userManager.GetUserAsync(User);
-            //
-            // if (currentUser == null)
-            // {
-            //     return Json(new { success = false, message = "User not found." });
-            // }
+            var currentUser = await _userManager.GetUserAsync(User);
+            
+            if (currentUser == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+            
+            var tutor = _context.Tutors.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (tutor == null)
+            {
+                return Json(new { success = false, message = "Tutor not found." });
+            }
+            
+            var questionToCheck = await _context.Questions.FirstOrDefaultAsync(q => q.id == id);
+            if (questionToCheck == null)
+            {
+                return Json(new { success = false, message = "Question not found." });
+            }
+            
+            if (questionToCheck.status == true)
+            {
+                return Json(new { success = false, message = "Question has been checked." });
+            }
+
+            if (questionToCheck.StudentSignUpId != null)
+            {
+                if (questionToCheck.StudentSignUp == null)
+                {
+                    return Json(new { success = false, message = "Question StudentSignUp doesn't exist." });
+                }
+                bool isMySessionQuestion = _context.TutorAllocations
+                    .Any(
+                        ta => ta.TutorId == tutor.Id &&
+                              ta.SessionId == questionToCheck.StudentSignUp.SessionId
+                    );
+                if (!isMySessionQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to check the Question which not belongs to your session." }
+                    );
+                }
+            }
+            
+            if (questionToCheck.TutorAllocationId != null)
+            {
+                if (questionToCheck.TutorAllocation == null)
+                {
+                    return Json(new { success = false, message = "Question TutorAllocation doesn't exist." });
+                }
+                bool isMyQuestion = questionToCheck.TutorAllocation.TutorId == tutor.Id;
+                if (!isMyQuestion)
+                {
+                    return Json(new { success = false,
+                        message = "No permission to check the Question created by another tutor." }
+                    );
+                }
+            }
 
             try
             {
-                // var questionsToUpdate = await _context.Questions
-                //     .Join(
-                //         _context.StudentSignUps,
-                //         q => q.StudentSignUpId,
-                //         ss => ss.Id,
-                //         (q, ss) => new { Question = q, StudentSignUp = ss }
-                //     )
-                //     .Join(
-                //         _context.Sessions,
-                //         x => x.StudentSignUp.SessionId,
-                //         s => s.Id,
-                //         (x, s) => new { x.Question, x.StudentSignUp, Session = s }
-                //     )
-                //     .Join(
-                //         _context.TutorAllocations,
-                //         x => x.Session.Id,
-                //         ta => ta.SessionId,
-                //         (x, ta) => new { x.Question, x.StudentSignUp, x.Session, TutorAllocation = ta }
-                //     )
-                //     .Join(
-                //         _context.Tutors,
-                //         x => x.TutorAllocation.TutorId,
-                //         t => t.Id,
-                //         (x, t) => new { x.Question, x.StudentSignUp, x.Session, x.TutorAllocation, Tutor = t }
-                //     )
-                //     .Where(x => questionIds.Contains(x.Question.id)
-                //                 && x.Tutor.userId == currentUser.Id
-                //                 && (x.Question.status == false || x.Question.status == null)
-                //     )
-                //     .Select(x => x.Question)
-                //     .ToListAsync();
-
-                // TODO just for debugging, remember to delete these code
-                var questionsToUpdate = await _context.Questions
-                    .Where(x => questionIds.Contains(x.id)
-                                && (x.status == false || x.status == null)
-                    )
-                    .ToListAsync();
-                
-                if (questionsToUpdate.Count == 0)
-                {
-                    return Json(new { success = false, message = "No eligible questions to update." });
-                }
-
-                foreach (var question in questionsToUpdate)
-                {
-                    question.status = true;
-                }
+                questionToCheck.status = true;
+                questionToCheck.updateDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Questions updated successfully." });
+                return Json(new { success = true, message = "Questions checked successfully." });
             }
             catch (Exception ex)
             {

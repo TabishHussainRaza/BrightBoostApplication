@@ -364,16 +364,11 @@
                 if (!validateForm()) {
                     return;
                 } else {
-                    //    var data={
-                    //                 Title:"fake question",
-                    //                 Description:"fake descrption",
-                    //                 StudentSignUpId:1
-                    //             }   
                     var data = {
                         Title: $("#question_title").val(),
                         Description: $("#description").val(),
-                        StudentSignUpId: 1,  //TODO StudentSignUpId can not be fiexed value
-                        Answer: ""
+                        TutorAllocationId: 1  // TODO TutorAllocationId can not be fiexed value
+                        // Answer: ""         // TODO Qin didn't write the "Answer input html tag" in "create Modal"
                     };
                     data = JSON.stringify(data)
                     $.ajax({
@@ -488,11 +483,7 @@
                 AnswerQuestion(updatedData);
             });
             $("#questions").on("click", ".change_status", function (e) {
-                var data = []
-                var questionId = {
-                    id: $(e.target).data('id'),
-                };
-                data.push(questionId.id)
+                var questionId = parseInt($(e.target).data('id'), 10);
                 swal({
                     title: "Comfirmation",
                     text: "Are you sure you want to mark this question?",
@@ -506,9 +497,8 @@
                     if (isConfirm) {
                         $.blockUI({ message: '<p> Loading..</p>' });
                         $.ajax({
-                            type: "POST",
-                            data: JSON.stringify(data),
-                            url: "/TutorQuestions/BatchUpdateStatus",
+                            type: "PUT",
+                            url: "/TutorQuestions/UpdateStatus/" + questionId,
                             dataType: "json",
                             contentType: "application/json",
                             success: function (result) {
@@ -540,7 +530,7 @@
             });
         }
         function AnswerQuestion(updatedData) {
-            questionId = parseInt($("#edit_question_Id").val(), 10),
+            var questionId = parseInt($("#edit_question_Id").val(), 10);
                 $.ajax({
                     url: "/TutorQuestions/" + questionId,
                     type: "PUT",
