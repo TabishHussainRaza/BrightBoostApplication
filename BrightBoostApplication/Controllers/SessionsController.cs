@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using BrightBoostApplication.Data;
 using BrightBoostApplication.Models;
 using BrightBoostApplication.Models.ViewModel;
+using Microsoft.AspNetCore.Identity;
+using BrightBoostApplication.Data.Migrations;
 
 namespace BrightBoostApplication.Controllers
 {
@@ -283,5 +285,72 @@ namespace BrightBoostApplication.Controllers
                 return Json(new { status = false, message = $"An error occurred: {ex.Message}" });
             }
         }
+
+        public async Task<IActionResult> CurrentSessions(int id)
+        {
+            var session = _context.Sessions.Where(s => s.Id == id).Include(t => t.TermCourse).FirstOrDefault();
+            if (session != null)
+            {
+                var ssessionVM = new SessionViewModel()
+                {
+                    SessionName = session.SessionName,
+                    SessionDay = session.SessionDay,
+                    SessionVenue = session.SessionVenue,
+                    Id = session.Id
+
+                };
+                return View(ssessionVM);
+            }
+            return Unauthorized();
+        }
+
+        public async Task<JsonResult> GetSessions(int id)
+        {
+            var session = _context.Sessions.Where(s=>s.Id == id).Include(t=>t.TermCourse).ThenInclude(a=>a.Term).FirstOrDefault();
+            if (session != null)
+            {
+                // Calculate the number of days in the term
+                int daysDifference = (int)(session.TermCourse.Term.endDate.Value - session.TermCourse.Term.startDate.Value).TotalDays;
+
+                var sessionsList = new List<SessionViewModel>();
+
+                // Calculate the initial session date based on the term start date and session day
+                DateTime initialSessionDate = session.TermCourse.Term.startDate.Value;
+                string sessionDayName = session.SessionDay; // Session day name as a string
+
+                // Find the first occurrence of the session day
+                while (initialSessionDate.DayOfWeek.ToString() != sessionDayName)
+                {
+                    initialSessionDate = initialSessionDate.AddDays(1);
+                }
+
+                // Calculate the end date based on the term end date
+                DateTime termEndDate = session.TermCourse.Term.endDate.Value;
+                DateTime sessionDate = initialSessionDate;
+
+                while (sessionDate <= termEndDate)
+                {
+                    var totalAtt = _context.Attendances.Where(a => a.StudentSignUp.SessionId == session.Id && a.AttendanceDateTime == sessionDate).Count();
+                    var mySession = new SessionViewModel()
+                    {
+                        SessionName = session.SessionName,
+                        SessionDay = session.SessionDay,
+                        SessionVenue = session.SessionVenue,
+                        Id = session.Id,
+                        TermCourse = new TermCourse(),
+                        startTime = sessionDate,
+                        Attendance = totalAtt > 0 ? totalAtt : -1
+                    };
+
+                    sessionsList.Add(mySession);
+                    sessionDate = sessionDate.AddDays(7);
+                }
+
+                return Json(sessionsList);
+            }
+            return Json(false);
+        }
+
+        
     }
 }

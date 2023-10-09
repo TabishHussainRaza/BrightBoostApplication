@@ -86,6 +86,24 @@
                             title: 'Session Venue',
                             data: 'sessionVenue'
                         },
+                        {
+                            title: 'Attendance',
+                            render: function (data, type, row, meta) {
+                                var text = row.attendance > 0 ? row.attendance: "Not Marked";
+                                return text;
+                            }
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `<a href="/Attendance/Index?sessionId=${row?.id}&AttendanceDateTime=${row.startTime}" class="btn-icon-split btn-sm btn btn-info js-update">
+                                            <span class="icon text-white-50"><i class='fa fa-check' style='color: white'></i></span>
+                                                                    </a>`;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
                     ]
                 });
             }
