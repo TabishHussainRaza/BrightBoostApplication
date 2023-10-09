@@ -7,8 +7,16 @@
         <div class="d-flex align-items-center">
             <h3 class="mr-auto">Student Questions</h3>
             <div class="btn-group" role="group">
-                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i>
-                    Add</button>
+
+                @if (ViewBag.canShowAdd == 1)
+                {
+                    <button id="addNew" class="btn btn-primary">
+                        <i class='fa fa-plus' style='color: white'></i>
+                        Add
+                    </button>
+                }
+
+                <input type="hidden" value="@ViewBag.SessionDateTime" id="session_time" />
             </div>
         </div>
     </div>
@@ -18,7 +26,7 @@
                 <div class="col-sm-12">
                     <div class="table-responsive">
                         <table id="questions" class="table table-bordered table-striped" style="border-spacing: 0;"
-                            width="100%"></table>
+                               width="100%"></table>
                     </div>
                 </div>
             </div>
@@ -45,10 +53,12 @@
                 <div class="row">
                     <div class="col-md-12">
                         <label class="label" for="question_title"><b>Question Title</b></label>
-                        <input type="text" id="question_title" class="form-control" name="question_title"
-                            style="width:100%" />
-                        <span id="question_empty_error" class="text-danger small" style="display:none">Question Title
-                            Required</span>
+                        <input type="text" id="question_title" class="form-control" name="title"
+                               style="width:100%" />
+                        <span id="question_empty_error" class="text-danger small" style="display:none">
+                            Question Title
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -56,9 +66,11 @@
                     <div class="col-md-12">
                         <label class="label" for="description"><b>Description </b></label>
                         <input type="text" id="description" class="form-control" name="description"
-                            style="width:100%" />
-                        <span id="description_empty_error" class="text-danger small" style="display:none">Description
-                            Required</span>
+                               style="width:100%" />
+                        <span id="description_empty_error" class="text-danger small" style="display:none">
+                            Description
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -85,9 +97,11 @@
                     <div class="col-md-12">
                         <label class="label" for="edit_question_title"><b>Questions Title</b></label>
                         <input type="text" readonly id="edit_question_title" class="form-control" style="width: 100%"
-                            name="QuestionTitle" />
-                        <span id="edit_term_empty_error" class="text-danger small" style="display:none">Questions Title
-                            Required</span>
+                               name="QuestionTitle" />
+                        <span id="edit_term_empty_error" class="text-danger small" style="display:none">
+                            Questions Title
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -95,9 +109,11 @@
                     <div class="col-md-12">
                         <label class="label" for="edit_description"><b>Description</b></label>
                         <textarea type="text" id="edit_description" class="form-control" style="width: 100%"
-                            name="edit_description"></textarea>
-                        <span id="edit_sd_empty_error" class="text-danger small" style="display:none">Description
-                            Required</span>
+                                  name="edit_description"></textarea>
+                        <span id="edit_sd_empty_error" class="text-danger small" style="display:none">
+                            Description
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -123,9 +139,11 @@
                     <div class="col-md-12">
                         <label class="label" for="info_question_title"><b>Questions Title</b></label>
                         <input type="text" readonly id="info_question_title" class="form-control" style="width: 100%"
-                            name="QuestionTitle" />
-                        <span id="info_term_empty_error" class="text-danger small" style="display:none">Questions Title
-                            Required</span>
+                               name="QuestionTitle" />
+                        <span id="info_term_empty_error" class="text-danger small" style="display:none">
+                            Questions Title
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -133,9 +151,11 @@
                     <div class="col-md-12">
                         <label class="label" for="info_description"><b>Description</b></label>
                         <textarea type="text" readonly id="info_description" class="form-control" style="width: 100%"
-                            name="info_description"></textarea>
-                        <span id="info_sd_empty_error" class="text-danger small" style="display:none">Description
-                            Required</span>
+                                  name="info_description"></textarea>
+                        <span id="info_sd_empty_error" class="text-danger small" style="display:none">
+                            Description
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -143,9 +163,11 @@
                     <div class="col-md-12">
                         <label class="label" for="info_answer"><b>Answer</b></label>
                         <textarea type="text" readonly id="info_answer" class="form-control" style="width: 100%"
-                            name="info_answer"></textarea>
-                        <span id="info_sd_empty_error" class="text-danger small" style="display:none">Answer
-                            Required</span>
+                                  name="info_answer"></textarea>
+                        <span id="info_sd_empty_error" class="text-danger small" style="display:none">
+                            Answer
+                            Required
+                        </span>
                         <br />
                     </div>
                 </div>
@@ -167,7 +189,7 @@
                 <div class="mb-3">
                     <label for="select_item_list" class="form-label">Subjects</label>
                     <select id="select_item_list" class="form-control item-selection" name="select_item_list"
-                        multiple></select>
+                            multiple></select>
                 </div>
                 <input type="hidden" class="form-control" id="addMappingTermId" name="addSubjects">
             </div>
@@ -182,320 +204,122 @@
 <link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
 <link href="~/css/styles.css" rel="stylesheet" />
 @section scripts
-{
-<script src="~/lib/datatables/datatables.min.js"></script>
-<script src="~/lib/select2/dist/js/select2.min.js"></script>
-<script>
-    var statusArray = [];
-    $(document).ready(function () {
-        var DataTable = null;
-        function getAll() {
-            $.blockUI({ message: '<p>Loading..</p>' });
-            $.ajax({
-                type: "GET",
-                url: "/StudentQuestions/GetAllMyQuestions",
-                success: function (result) {
-                    $.unblockUI();
-                    if (result.success) {
-                        if (DataTable == null) {
-                            console.log(result)
-                            initializeDataTable(result.questions);
-                            saveStatus(result.questions)
-                        } else {
-                            console.log(result)
-                            updateDataTable(result.questions);
-                        }
-                    } else {
-                        console.log("No Items found.");
-                    }
-                },
-                error: function (error) {
-                    $.unblockUI();
-                }
-            });
-        }
-        function saveStatus(data) {
-            statusArray = []
-            for (let i = 0; i < data.length; i++) {
-                statusArray.push({
-                    id: data[i].id,
-                    status: data[i].status
-                })
-            }
-            console.log(statusArray)
-        }
-        function updateDataTable(updatedData) {
-            DataTable.clear().rows.add(updatedData).draw();
-        }
-        function initializeDataTable(data) {
-            DataTable = $(`#questions`).DataTable({
-                data: data,
-                columns: [
-                    {
-                        title: 'Question Title',
-                        data: "title",
-                    },
-                    {
-                        title: 'Description',
-                        render: function (data, type, row, meta) {
-                            return row.description
-                        }
-                    },
-                    {
-                        title: 'Answered',
-                        render: function (data, type, row, meta) {
-                            var text;
-                            if (row.status) {
-                                text = "Yes"
+    {
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script>
+        var statusArray = [];
+        $(document).ready(function () {
+            var DataTable = null;
+            var date = '@ViewBag.SessionDateTime.ToString()';
+            function getAll() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/StudentQuestions/GetAllMyQuestions?SessionId=" + @ViewBag.SessionId + "&SessionDateTime=" + date,
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result.success) {
+                            if (DataTable == null) {
+                                console.log(result)
+                                initializeDataTable(result.questions);
+                                saveStatus(result.questions)
                             } else {
-                                text = "No"
+                                console.log(result)
+                                updateDataTable(result.questions);
                             }
-                            return text;
+                        } else {
+                            console.log("No Items found.");
                         }
                     },
-                    {
-                        title: 'Action',
-                        render: function (data, type, row, meta) {
-                            var text = '<div style="display:flex; justify-content:space-around">';
-                            text += `
-                                <a href="#" class="btn-icon-split btn-sm btn btn-info js-info" data-id="${row.id}">
-                                <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
-                                </a>
-                                <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
-                                <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
-                                </a>
-                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
-                                <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
-                                </a>`;
-                            text += '</div>'
-                            return text;
-                        }
-                    },
-                ]
-            });
-        }
-        getAll();
-        init();
-        function populateModal(id) {
-            $.ajax({
-                url: "/StudentQuestions/Details/" + id,
-                type: "GET",
-                success: function (data) {
-                    if (data) {
-                        $("#info_question_Id").val(id);
-                        $("#info_question_title").val(data.question.title);
-                        $("#info_description").val(data.question.description);
-                        $("#info_answer").val(data.question.answer);
-                        $("#infoModal").modal("show");
-                    } else {
-                        swal({
-                            title: 'No details found!',
-                            text: 'Could Not find details!',
-                            option: "error",
-                            icon: "error",
-                            timer: 3000
-                        });
+                    error: function (error) {
+                        $.unblockUI();
                     }
-                },
-                error: function () {
-                    swal({
-                        title: 'No details found!',
-                        text: 'Could Not find details!',
-                        option: "error",
-                        icon: "error",
-                        timer: 3000
-                    });
-                }
-            });
-        }
-        function populateEditModal(id) {
-            $.ajax({
-                url: "/StudentQuestions/Details/" + id,
-                type: "GET",
-                success: function (data) {
-                    if (data) {
-                        $("#edit_question_Id").val(id);
-                        $("#edit_question_title").val(data.question.title);
-                        $("#edit_description").val(data.question.description);
-                        $("#editModal").modal("show");
-                    } else {
-                        swal({
-                            title: 'No details found!',
-                            text: 'Could Not find details!',
-                            option: "error",
-                            icon: "error",
-                            timer: 3000
-                        });
-                    }
-                },
-                error: function () {
-                    swal({
-                        title: 'No details found!',
-                        text: 'Could Not find details!',
-                        option: "error",
-                        icon: "error",
-                        timer: 3000
-                    });
-                }
-            });
-        }
-        function init() {
-            $("#addNew").on("click", function (e) {
-                //  create();
-                $('#addNewModal').modal('show');
-                $('#addNewModal').on('hidden.bs.modal', function () {
-                    $('#question_title').val('');
-                    $('#question_empty_error').css("display", "none");
-
-                    $('#description').val('');
-                    $('#description_empty_error').css("display", "none");
                 });
-            })
-            $('#btnSaveitem').on('click', function (e) {
-                if (!validateForm()) {
-                    return;
-                } else { 
-                    var data = {
-                        Title: $("#question_title").val(),
-                        Description: $("#description").val(),
-                        StudentSignUpId: 1   // TODO TutorAllocationId can not be fiexed value
-                    };
-                    data = JSON.stringify(data)
-                    $.ajax({
-                        type: "POST",
-                        data: data,
-                        dataType: "json",
-                        contentType: "application/json",
-                        url: "/StudentQuestions/Create",
-                        success: function (result) {
-                            if (result) {
-                                $('#question_title').val();
-                                $('#addNewModal').modal('hide');
-                                swal({
-                                    title: 'Question Added!',
-                                    text: 'Successfully Created!',
-                                    option: "success",
-                                    icon: "success",
-                                    timer: 3000
-                                });
-                                getAll();
-                            } else {
-                                swal({
-                                    title: 'Question Addition Failed!',
-                                    text: 'Could Not be Added!',
-                                    option: "error",
-                                    icon: "error",
-                                    timer: 3000
-                                });
+            }
+            function saveStatus(data) {
+                statusArray = []
+                for (let i = 0; i < data.length; i++) {
+                    statusArray.push({
+                        id: data[i].id,
+                        status: data[i].status
+                    })
+                }
+                console.log(statusArray)
+            }
+            function updateDataTable(updatedData) {
+                DataTable.clear().rows.add(updatedData).draw();
+            }
+            function initializeDataTable(data) {
+                DataTable = $(`#questions`).DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Question Title',
+                            data: "title",
+                        },
+                        {
+                            title: 'Description',
+                            render: function (data, type, row, meta) {
+                                return row.description
                             }
                         },
-                        error: function (data) {
-                            console.log(data);
-                        }
-                    });
-                }
-            });
-            $("#questions").on("click", ".js-delete", function (e) {
-                var data = {
-                    id: $(e.target).data('id')
-                };
-                swal({
-                    title: "Comfirmation",
-                    text: "Are you sure you want to delete the question!",
-                    icon: "warning",
-                    buttons: [
-                        'No',
-                        'Yes'
-                    ],
-                    dangerMode: true,
-                }).then(function (isConfirm) {
-                    if (isConfirm) {
-                        $.blockUI({ message: '<p> Loading..</p>' });
-                        $.ajax({
-                            type: "DELETE",
-                            data: data,
-                            url: "/StudentQuestions/" + data.id,
-                            dataType: "json",
-                            success: function (result) {
-                                $.unblockUI();
-                                if (result) {
-                                    swal({
-                                        title: 'Question Deleted!',
-                                        text: 'Successfully Deleted!',
-                                        option: "success",
-                                        icon: "success",
-                                        timer: 3000
-                                    });
-                                    getAll();
+                        {
+                            title: 'Answered',
+                            render: function (data, type, row, meta) {
+                                var text;
+                                if (row.status) {
+                                    text = "Yes"
                                 } else {
-                                    swal({
-                                        title: 'Question Deletion Failed!',
-                                        text: 'Could Not be Deleted!',
-                                        option: "error",
-                                        icon: "error",
-                                        timer: 3000
-                                    });
+                                    text = "No"
                                 }
+                                return text;
                             }
-                        });
-                    } else {
-                        swal("Cancelled", "Question Not deleted", "error");
-                    }
-                })
-            });
-            $("#questions").on("click", ".js-info", function (e) {
-                var questionId = $(this).data("id");
-                populateModal(questionId);
-            });
-            $("#questions").on("click", ".js-update", function (e) {
-                var questionId = $(this).data("id");
-                for (let i = 0; i < statusArray.length; i++) {
-                    if (questionId == statusArray[i].id) {
-                        if (statusArray[i].status) {
-                            //this quesion has been marked,can not be opened
-                            swal({
-                                title: 'Question Locked!',
-                                text: 'Cannot be opened!',
-                                option: "error",
-                                icon: "error",
-                                timer: 3000
-                            });
-                            return;
-                        }
-                    }
-                }
-                populateEditModal(questionId);
-            });
-            $("#btnSaveEdit").click(function () {
-                var updatedData = {
-                    Description: $("#edit_description").val(),
-                };
-                UpdateQuestion(updatedData);
-            });
-        }
-        function UpdateQuestion(updatedData) {
-            questionId = parseInt($("#edit_question_Id").val(), 10),
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+
+                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-info js-info" data-id="${row.id}">
+                                        <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-eye' style='color: white' data-id="${row.id}"></i></span>
+                                        </a>
+
+                                        `;
+                                if (@ViewBag.canShowAdd) {
+                                    text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
+                                                        <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
+                                                        </a>`;
+                                }
+                                if (!row.status && @ViewBag.canShowAdd) {
+                                    text += `<a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row.id}">
+                                                                                <span class="icon text-white-50"  data-id="${row.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row.id}"></i></span>
+                                                                                </a>`;
+                                }
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+            getAll();
+            init();
+            function populateModal(id) {
                 $.ajax({
-                    url: "/StudentQuestions/" + questionId,
-                    type: "PUT",
-                    contentType: "application/json",
-                    data: JSON.stringify(updatedData),
-                    success: function (response) {
-                        if (response.success === true) {
-                            //  close the edit modal
-                            $("#editModal").modal("hide");
-                            swal({
-                                title: 'Question Updated!',
-                                text: 'Successfully Updated!',
-                                option: "success",
-                                icon: "success",
-                                timer: 3000
-                            });
-                            getAll();
+                    url: "/StudentQuestions/Details/" + id,
+                    type: "GET",
+                    success: function (data) {
+                        if (data) {
+                            $("#info_question_Id").val(id);
+                            $("#info_question_title").val(data.question.title);
+                            $("#info_description").val(data.question.description);
+                            $("#info_answer").val(data.question.answer);
+                            $("#infoModal").modal("show");
                         } else {
                             swal({
-                                title: 'Question Update Failed!',
-                                text: 'Could Not be Updated!',
+                                title: 'No details found!',
+                                text: 'Could Not find details!',
                                 option: "error",
                                 icon: "error",
                                 timer: 3000
@@ -504,38 +328,244 @@
                     },
                     error: function () {
                         swal({
-                            title: 'Term Update Failed!',
-                            text: 'Could Not be Updated!',
+                            title: 'No details found!',
+                            text: 'Could Not find details!',
                             option: "error",
                             icon: "error",
                             timer: 3000
                         });
                     }
                 });
-        }
-        function validateForm() {
-            var title = $("#question_title").val();
-            var description = $("#description").val();
-            var isValid = true;
-
-            // Check if title is empty
-            if (title === "") {
-                $("#question_empty_error").show();
-                isValid = false;
-            } else {
-                $("#question_empty_error").hide();
             }
-
-            // Check if description is empty
-            if (description === "") {
-                $("#description_empty_error").show();
-                isValid = false;
-            } else {
-                $("#description_empty_error").hide();
+            function populateEditModal(id) {
+                $.ajax({
+                    url: "/StudentQuestions/Details/" + id,
+                    type: "GET",
+                    success: function (data) {
+                        if (data) {
+                            $("#edit_question_Id").val(id);
+                            $("#edit_question_title").val(data.question.title);
+                            $("#edit_description").val(data.question.description);
+                            $("#editModal").modal("show");
+                        } else {
+                            swal({
+                                title: 'No details found!',
+                                text: 'Could Not find details!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal({
+                            title: 'No details found!',
+                            text: 'Could Not find details!',
+                            option: "error",
+                            icon: "error",
+                            timer: 3000
+                        });
+                    }
+                });
             }
+            function init() {
+                $("#addNew").on("click", function (e) {
+                    //  create();
+                    $('#addNewModal').modal('show');
+                    $('#addNewModal').on('hidden.bs.modal', function () {
+                        $('#question_title').val('');
+                        $('#question_empty_error').css("display", "none");
 
-            return isValid;
-        }
-    });
-</script>
+                        $('#description').val('');
+                        $('#description_empty_error').css("display", "none");
+                    });
+                })
+                $('#btnSaveitem').on('click', function (e) {
+                    if (!validateForm()) {
+                        return;
+                    } else {
+                        var data = {
+                            Title: $("#question_title").val(),
+                            Description: $("#description").val(),
+                            StudentSignUpId: @ViewBag.StudentSignUpId,
+                            Date: $("#session_time").val(),
+                        };
+                        $.ajax({
+                            url: "/StudentQuestions/Create",
+                            type: "POST",
+                            dataType: "json",
+                            data: JSON.stringify(data),
+                            contentType: "application/json",
+                            success: function (result) {
+                                if (result.success) {
+                                    $('#question_title').val();
+                                    $('#description').val();
+                                    $('#addNewModal').modal('hide');
+                                    swal({
+                                        title: 'Question Added!',
+                                        text: 'Successfully Created!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAll();
+                                } else {
+                                    swal({
+                                        title: 'Question Addition Failed!',
+                                        text: 'Could Not be Added!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            },
+                            error: function (data) {
+                                console.log(data);
+                            }
+                        });
+                    }
+                });
+                $("#questions").on("click", ".js-delete", function (e) {
+                    var data = {
+                        id: $(e.target).data('id')
+                    };
+                    swal({
+                        title: "Comfirmation",
+                        text: "Are you sure you want to delete the question!",
+                        icon: "warning",
+                        buttons: [
+                            'No',
+                            'Yes'
+                        ],
+                        dangerMode: true,
+                    }).then(function (isConfirm) {
+                        if (isConfirm) {
+                            $.blockUI({ message: '<p> Loading..</p>' });
+                            $.ajax({
+                                type: "DELETE",
+                                data: data,
+                                url: "/StudentQuestions/" + data.id,
+                                dataType: "json",
+                                success: function (result) {
+                                    $.unblockUI();
+                                    if (result) {
+                                        swal({
+                                            title: 'Question Deleted!',
+                                            text: 'Successfully Deleted!',
+                                            option: "success",
+                                            icon: "success",
+                                            timer: 3000
+                                        });
+                                        getAll();
+                                    } else {
+                                        swal({
+                                            title: 'Question Deletion Failed!',
+                                            text: 'Could Not be Deleted!',
+                                            option: "error",
+                                            icon: "error",
+                                            timer: 3000
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            swal("Cancelled", "Question Not deleted", "error");
+                        }
+                    })
+                });
+                $("#questions").on("click", ".js-info", function (e) {
+                    var questionId = $(this).data("id");
+                    populateModal(questionId);
+                });
+                $("#questions").on("click", ".js-update", function (e) {
+                    var questionId = $(this).data("id");
+                    for (let i = 0; i < statusArray.length; i++) {
+                        if (questionId == statusArray[i].id) {
+                            if (statusArray[i].status) {
+                                //this quesion has been marked,can not be opened
+                                swal({
+                                    title: 'Question Locked!',
+                                    text: 'Cannot be opened!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
+                                return;
+                            }
+                        }
+                    }
+                    populateEditModal(questionId);
+                });
+                $("#btnSaveEdit").click(function () {
+                    var updatedData = {
+                        Description: $("#edit_description").val(),
+                    };
+                    UpdateQuestion(updatedData);
+                });
+            }
+            function UpdateQuestion(updatedData) {
+                questionId = parseInt($("#edit_question_Id").val(), 10),
+                    $.ajax({
+                        url: "/StudentQuestions/" + questionId,
+                        type: "PUT",
+                        contentType: "application/json",
+                        data: JSON.stringify(updatedData),
+                        success: function (response) {
+                            if (response.success === true) {
+                                //  close the edit modal
+                                $("#editModal").modal("hide");
+                                swal({
+                                    title: 'Question Updated!',
+                                    text: 'Successfully Updated!',
+                                    option: "success",
+                                    icon: "success",
+                                    timer: 3000
+                                });
+                                getAll();
+                            } else {
+                                swal({
+                                    title: 'Question Update Failed!',
+                                    text: 'Could Not be Updated!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
+                            }
+                        },
+                        error: function () {
+                            swal({
+                                title: 'Term Update Failed!',
+                                text: 'Could Not be Updated!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    });
+            }
+            function validateForm() {
+                var title = $("#question_title").val();
+                var description = $("#description").val();
+                var isValid = true;
+
+                // Check if title is empty
+                if (title === "") {
+                    $("#question_empty_error").show();
+                    isValid = false;
+                } else {
+                    $("#question_empty_error").hide();
+                }
+
+                // Check if description is empty
+                if (description === "") {
+                    $("#description_empty_error").show();
+                    isValid = false;
+                } else {
+                    $("#description_empty_error").hide();
+                }
+
+                return isValid;
+            }
+        });
+    </script>
 }

@@ -11,6 +11,9 @@ using BrightBoostApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using ServiceStack;
+using System.Globalization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient.Server;
 
 namespace BrightBoostApplication.Controllers
 {
@@ -27,15 +30,35 @@ namespace BrightBoostApplication.Controllers
         }
 
         // GET: Questions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int SessionId, DateTime? SessionDateTime)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+            var student = _context.Student.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (student == null)
+            {
+                return Unauthorized();
+            }
+            var studentSignUp = _context.StudentSignUps.Where(s => s.SessionId == SessionId && s.StudentId == student.Id).FirstOrDefault();
+            if (studentSignUp == null)
+            {
+                return Unauthorized();
+            }
+            ViewBag.SessionDateTime = SessionDateTime;
+            ViewBag.SessionId = SessionId;
+            ViewBag.StudentSignUpId= studentSignUp.Id;
+            ViewBag.canShowAdd = SessionDateTime.HasValue && SessionDateTime.Value.Date < DateTime.Now.Date ? 0 : 1;
             return _context.Questions != null ? 
                 View() :
                 Problem("Entity set 'ApplicationDbContext.Questions' is null.");
         }
         
         [HttpGet("StudentQuestions/GetAllMyQuestions")]
-        public async Task<JsonResult> GetAllMyQuestionsAsync()
+        public async Task<JsonResult> GetAllMyQuestionsAsync(int SessionId, string SessionDateTime)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             
@@ -48,33 +71,27 @@ namespace BrightBoostApplication.Controllers
             {
                 return Json(new { success = false, message = "Student not found." });
             }
-            
-            var sessionIds = _context.StudentSignUps
-                .Where(ss => ss.StudentId == student.Id)
-                .Select(ss => ss.SessionId)
-                .Distinct();
+
+            DateTime.TryParseExact(SessionDateTime, "d/M/yyyy h:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate);
+
+            var session = _context.Sessions.Where(s=>s.Id == SessionId).FirstOrDefault();
+
             var myQuestions = _context.Questions
-                .Join(
-                    _context.StudentSignUps,
-                    q => q.StudentSignUpId,
-                    ssup => ssup.Id,
-                    (q, ssup) => new { q, ssup }
-                )
-                .Where(x => sessionIds.Contains(x.ssup.SessionId))
+                .Where(x => x.StudentSignUp.SessionId == session.Id && x.sessionDate == parsedDate).Include(q=>q.StudentSignUp)
                 .Select(
                     tmp => new
                     {
-                        tmp.q.id,
-                        tmp.q.title,
-                        tmp.q.description,
-                        tmp.q.answer,
-                        tmp.q.createdDate,
-                        tmp.q.updateDate,
-                        tmp.q.status,
-                        tmp.q.order
+                        tmp.id,
+                        tmp.title,
+                        tmp.description,
+                        tmp.answer,
+                        tmp.createdDate,
+                        tmp.updateDate,
+                        tmp.status,
+                        tmp.order
                     }
-                )
-                .ToListAsync();
+                ).OrderBy(x => x.createdDate)
+                .ToList();
 
             return Json(new { success = true, questions = myQuestions });
         }
@@ -143,20 +160,31 @@ namespace BrightBoostApplication.Controllers
                 return Json(new { success = false, message = "Invalid data received." });
             }
 
+            if (String.IsNullOrEmpty(model.Date))
+            {
+                return Json(new { success = false, message = "Invalid data received." });
+            }
+
             try
             {
-                var newQuestion = new Question
+                if(DateTime.TryParseExact(model.Date, "d/M/yyyy h:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
                 {
-                    title = model.Title,
-                    description = model.Description,
-                    createdDate = DateTime.Now,
-                    updateDate = DateTime.Now,
-                    StudentSignUpId = model.StudentSignUpId
-                };
-
-                _context.Questions.Add(newQuestion);
-                await _context.SaveChangesAsync();
-
+                    var newQuestion = new Question
+                    {
+                        title = model.Title,
+                        description = model.Description,
+                        sessionDate = parsedDate,
+                        createdDate = DateTime.Now,
+                        updateDate = DateTime.Now,
+                        StudentSignUpId = model.StudentSignUpId
+                    };
+                    _context.Questions.Add(newQuestion);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Invalid date format." });
+                }
                 return Json(new { success = true, message = "Question created successfully." });
             }
             catch (Exception ex)

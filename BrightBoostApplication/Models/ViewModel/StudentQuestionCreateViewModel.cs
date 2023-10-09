@@ -1,8 +1,11 @@
-namespace BrightBoostApplication.Models.ViewModel;
-
-public class StudentQuestionCreateViewModel
+namespace BrightBoostApplication.Models.ViewModel
 {
-    public int StudentSignUpId { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public class StudentQuestionCreateViewModel
+    {
+        public int StudentSignUpId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Date { get; set; }
+    }
 }
+

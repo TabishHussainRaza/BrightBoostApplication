@@ -119,12 +119,6 @@
                                     <p>Register</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="@Url.Action("Index", "StudentQuestions")" class="nav-link">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    <p>Question</p>
-                                </a>
-                            </li>
                         }
 
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Tutor"))

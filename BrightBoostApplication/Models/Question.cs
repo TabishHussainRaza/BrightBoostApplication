@@ -6,6 +6,7 @@
         public string title { get; set; }
         public string description { get; set; }
         public string answer { get; set; }
+        public DateTime? sessionDate { get; set; }
         public DateTime createdDate { get; set; }
         public DateTime updateDate { get; set; }
         public Nullable<bool> status { get; set; } = false;

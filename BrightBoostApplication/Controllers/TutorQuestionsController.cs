@@ -11,6 +11,8 @@ using BrightBoostApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using ServiceStack;
+using System.Globalization;
+using BrightBoostApplication.Data.Migrations;
 
 namespace BrightBoostApplication.Controllers
 {
@@ -27,15 +29,32 @@ namespace BrightBoostApplication.Controllers
         }
 
         // GET: Questions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int SessionId, DateTime? SessionDateTime)
         {
-            return _context.Questions != null ? 
-                View() :
-                Problem("Entity set 'ApplicationDbContext.Questions' is null.");
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+            var tutor = _context.Tutors.Where(s => s.userId == currentUser.Id).FirstOrDefault();
+            if (tutor == null)
+            {
+                return Unauthorized();
+            }
+            var tutorSignUp = _context.TutorAllocations.Where(s => s.SessionId == SessionId && s.TutorId == tutor.Id).FirstOrDefault();
+            if (tutorSignUp == null)
+            {
+                return Unauthorized();
+            }
+            ViewBag.SessionDateTime = SessionDateTime;
+            ViewBag.SessionId = SessionId;
+            ViewBag.TutorAllId = tutorSignUp.Id;
+            return View();
         }
-        
+
         [HttpGet("TutorQuestions/GetAllMySessionQuestions")]
-        public async Task<JsonResult> GetAllMySessionQuestionsAsync()
+        public async Task<JsonResult> GetAllMySessionQuestionsAsync(int SessionId, string SessionDateTime)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             
@@ -50,52 +69,47 @@ namespace BrightBoostApplication.Controllers
                 return Json(new { success = false, message = "Tutor not found." });
             }
 
-            var sessionIds = _context.TutorAllocations
-                .Where(ta => ta.TutorId == tutor.Id)
-                .Select(ta => ta.SessionId).ToList();
-            
+            DateTime.TryParseExact(SessionDateTime, "d/M/yyyy h:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate);
+
+            var session = _context.Sessions.Where(s => s.Id == SessionId).FirstOrDefault();
+
             try
             {
-                var allQuestions = await _context.Questions
-                    .GroupJoin(
-                        _context.StudentSignUps, 
-                        q => q.StudentSignUpId,
-                        ss => ss.Id,
-                        (q, ss) => new { q, ss }
-                    )
-                    .SelectMany(
-                        x => x.ss.DefaultIfEmpty(),
-                        (x, ss) => new { x.q, ss }  
-                    )
-                    .GroupJoin(
-                        _context.TutorAllocations,
-                        x => x.q.TutorAllocationId, 
-                        t => t.Id,
-                        (x, t) => new { x.q, x.ss, t }
-                    )
-                    .SelectMany(
-                        x => x.t.DefaultIfEmpty(),
-                        (x, t) => new { x.q, x.ss, t }
-                    )
-                    .Where(
-                        tmp => (tmp.ss != null && sessionIds.Contains(tmp.ss.SessionId)) ||
-                               (tmp.t != null && sessionIds.Contains(tmp.t.SessionId))
-                    )
-                    .Select(
-                        tmp => new {
-                            tmp.q.id,
-                            tmp.q.title,
-                            tmp.q.description,
-                            tmp.q.answer,
-                            tmp.q.createdDate,
-                            tmp.q.updateDate, 
-                            tmp.q.status,
-                            tmp.q.order
-                        }
-                    )
-                    .ToListAsync();
+                var myStudentQuestions = _context.Questions
+                .Where(x => (x.StudentSignUp.SessionId == session.Id) && x.sessionDate == parsedDate).Include(q => q.StudentSignUp)
+                .Select(
+                    tmp => new
+                    {
+                        tmp.id,
+                        tmp.title,
+                        tmp.description,
+                        tmp.answer,
+                        tmp.createdDate,
+                        tmp.updateDate,
+                        tmp.status,
+                        tmp.order
+                    }
+                ).OrderBy(x => x.createdDate)
+                .ToList();
 
-                return Json(new { success = true, questions = allQuestions });
+                var myQuestions = _context.Questions
+                .Where(x => (x.TutorAllocation.SessionId == session.Id) && x.sessionDate == parsedDate).Include(q => q.TutorAllocation)
+                .Select(
+                    tmp => new
+                    {
+                        tmp.id,
+                        tmp.title,
+                        tmp.description,
+                        tmp.answer,
+                        tmp.createdDate,
+                        tmp.updateDate,
+                        tmp.status,
+                        tmp.order
+                    }
+                ).OrderBy(x => x.createdDate)
+                .ToList();
+
+                return Json(new { success = true, questions = myStudentQuestions.Concat(myQuestions) });
             }
             catch (Exception ex)
             {
@@ -125,44 +139,6 @@ namespace BrightBoostApplication.Controllers
             {
                 return Json(new { success = false, message = "Question not found." });
             }
-
-            if (studentQuestion.StudentSignUpId != null)
-            {
-                if (studentQuestion.StudentSignUp == null)
-                {
-                    return Json(new { success = false, message = "Question StudentSignUp doesn't exist." });
-                }
-                bool isMySessionQuestion = _context.TutorAllocations
-                    .Any(
-                        ta => ta.TutorId == tutor.Id &&
-                              ta.SessionId == studentQuestion.StudentSignUp.SessionId
-                    );
-                if (!isMySessionQuestion)
-                {
-                    return Json(new { success = false,
-                        message = "No permission to view the Question which not belongs to your session." }
-                    );
-                }
-            }
-            
-            if (studentQuestion.TutorAllocationId != null)
-            {
-                if (studentQuestion.TutorAllocation == null)
-                {
-                    return Json(new { success = false, message = "Question TutorAllocation doesn't exist." });
-                }
-                bool isMySessionQuestion = _context.TutorAllocations
-                    .Any(
-                        ta => ta.TutorId == tutor.Id &&
-                              ta.SessionId == studentQuestion.TutorAllocation.SessionId
-                    );
-                if (!isMySessionQuestion)
-                {
-                    return Json(new { success = false,
-                        message = "No permission to view the Question which not belongs to your session." }
-                    );
-                }
-            }
             return Json(new { success = true, question = studentQuestion });
         }
         
@@ -183,18 +159,31 @@ namespace BrightBoostApplication.Controllers
 
             try
             {
-                var newQuestion = new Question
+                if (DateTime.TryParseExact(model.Date, "d/M/yyyy h:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
                 {
-                    title = model.Title,
-                    description = model.Description,
-                    answer = model.Answer,
-                    createdDate = DateTime.Now,
-                    updateDate = DateTime.Now,
-                    TutorAllocationId = model.TutorAllocationId
-                };
+                    var newQuestion = new Question
+                    {
+                        title = model.Title,
+                        description = model.Description,
+                        answer = model.Answer,
+                        sessionDate = parsedDate,
+                        createdDate = DateTime.Now,
+                        updateDate = DateTime.Now,
+                        TutorAllocationId = model.TutorAllocationId
+                    };
 
-                _context.Questions.Add(newQuestion);
-                await _context.SaveChangesAsync();
+                    if (!string.IsNullOrEmpty(model.Answer))
+                    {
+                        newQuestion.status = true;
+                    }
+                    _context.Questions.Add(newQuestion);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Invalid date format." });
+                }
+
 
                 return Json(new { success = true, message = "Question created successfully." });
             }
@@ -225,52 +214,17 @@ namespace BrightBoostApplication.Controllers
             {
                 return Json(new { success = false, message = "Question not found." });
             }
-            
-            if (questionToUpdate.status == true)
-            {
-                return Json(new { success = false, message = "Question has been checked." });
-            }
-
-            if (questionToUpdate.StudentSignUpId != null)
-            {
-                if (questionToUpdate.StudentSignUp == null)
-                {
-                    return Json(new { success = false, message = "Question StudentSignUp doesn't exist." });
-                }
-                bool isMySessionQuestion = _context.TutorAllocations
-                    .Any(
-                        ta => ta.TutorId == tutor.Id &&
-                              ta.SessionId == questionToUpdate.StudentSignUp.SessionId
-                    );
-                if (!isMySessionQuestion)
-                {
-                    return Json(new { success = false,
-                        message = "No permission to answer the Question which not belongs to your session." }
-                    );
-                }
-            }
-            
-            if (questionToUpdate.TutorAllocationId != null)
-            {
-                if (questionToUpdate.TutorAllocation == null)
-                {
-                    return Json(new { success = false, message = "Question TutorAllocation doesn't exist." });
-                }
-                bool isMyQuestion = questionToUpdate.TutorAllocation.TutorId == tutor.Id;
-                if (!isMyQuestion)
-                {
-                    return Json(new { success = false,
-                        message = "No permission to answer the Question created by another tutor." }
-                    );
-                }
-            }
 
             try
             {
                 // Update only the answer
                 questionToUpdate.answer = model.Answer;
-                questionToUpdate.updateDate = DateTime.Now;
 
+                if(!string.IsNullOrEmpty(questionToUpdate.answer))
+                {
+                    questionToUpdate.status = true;
+                }
+                questionToUpdate.updateDate = DateTime.Now;
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, message = "Question answered successfully." });
