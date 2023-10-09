@@ -3,6 +3,7 @@
     public class SessionViewModel :Session
     {
         public int? SignUpCount { get; set; }
+        public int? Attendance { get; set; }
     }
 
     public class SessionUpdateViewModel
