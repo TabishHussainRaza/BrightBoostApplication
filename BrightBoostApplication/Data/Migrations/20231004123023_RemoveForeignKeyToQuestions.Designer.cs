@@ -4,6 +4,7 @@ using BrightBoostApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BrightBoostApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231004123023_RemoveForeignKeyToQuestions")]
+    partial class RemoveForeignKeyToQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,6 +77,7 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("firstName")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -83,6 +86,7 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnName("isActive");
 
                     b.Property<string>("lastName")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -110,7 +114,7 @@ namespace BrightBoostApplication.Data.Migrations
                     b.Property<DateTime>("AttendanceDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("StudentSignUpId")
+                    b.Property<int>("StudentSignUpId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("createdDate")
@@ -166,31 +170,28 @@ namespace BrightBoostApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
-                    b.Property<int?>("StudentSignUpId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TutorAllocationId")
+                    b.Property<int>("StudentSignUpId")
                         .HasColumnType("int");
 
                     b.Property<string>("answer")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("createdDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("order")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("sessionDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool?>("status")
                         .HasColumnType("bit");
 
                     b.Property<string>("title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("updateDate")
@@ -199,8 +200,6 @@ namespace BrightBoostApplication.Data.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("StudentSignUpId");
-
-                    b.HasIndex("TutorAllocationId");
 
                     b.ToTable("Questions");
                 });
@@ -220,18 +219,22 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SessionColor")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SessionDay")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SessionName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SessionVenue")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TermCourseId")
+                    b.Property<int>("TermCourseId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("createdDate")
@@ -277,6 +280,7 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("userId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -348,9 +352,11 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("subjectDescription")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("subjectName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("updateDate")
@@ -370,6 +376,7 @@ namespace BrightBoostApplication.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("TermName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("createdDate")
@@ -410,6 +417,7 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -430,6 +438,7 @@ namespace BrightBoostApplication.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Availability")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("createdDate")
@@ -442,6 +451,7 @@ namespace BrightBoostApplication.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("userId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -613,7 +623,9 @@ namespace BrightBoostApplication.Data.Migrations
                 {
                     b.HasOne("BrightBoostApplication.Models.StudentSignUp", "StudentSignUp")
                         .WithMany()
-                        .HasForeignKey("StudentSignUpId");
+                        .HasForeignKey("StudentSignUpId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("StudentSignUp");
                 });
@@ -641,22 +653,20 @@ namespace BrightBoostApplication.Data.Migrations
                 {
                     b.HasOne("BrightBoostApplication.Models.StudentSignUp", "StudentSignUp")
                         .WithMany()
-                        .HasForeignKey("StudentSignUpId");
-
-                    b.HasOne("BrightBoostApplication.Models.TutorAllocation", "TutorAllocation")
-                        .WithMany()
-                        .HasForeignKey("TutorAllocationId");
+                        .HasForeignKey("StudentSignUpId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("StudentSignUp");
-
-                    b.Navigation("TutorAllocation");
                 });
 
             modelBuilder.Entity("BrightBoostApplication.Models.Session", b =>
                 {
                     b.HasOne("BrightBoostApplication.Models.TermCourse", "TermCourse")
                         .WithMany()
-                        .HasForeignKey("TermCourseId");
+                        .HasForeignKey("TermCourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TermCourse");
                 });

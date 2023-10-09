@@ -4,6 +4,7 @@ using BrightBoostApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BrightBoostApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231007054739_AddNullableColumnAndIndexesToQuestions")]
+    partial class AddNullableColumnAndIndexesToQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,10 +168,7 @@ namespace BrightBoostApplication.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
-                    b.Property<int?>("StudentSignUpId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TutorAllocationId")
+                    b.Property<int>("StudentSignUpId")
                         .HasColumnType("int");
 
                     b.Property<string>("answer")
@@ -184,9 +183,6 @@ namespace BrightBoostApplication.Data.Migrations
                     b.Property<int>("order")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("sessionDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool?>("status")
                         .HasColumnType("bit");
 
@@ -199,8 +195,6 @@ namespace BrightBoostApplication.Data.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("StudentSignUpId");
-
-                    b.HasIndex("TutorAllocationId");
 
                     b.ToTable("Questions");
                 });
@@ -641,15 +635,11 @@ namespace BrightBoostApplication.Data.Migrations
                 {
                     b.HasOne("BrightBoostApplication.Models.StudentSignUp", "StudentSignUp")
                         .WithMany()
-                        .HasForeignKey("StudentSignUpId");
-
-                    b.HasOne("BrightBoostApplication.Models.TutorAllocation", "TutorAllocation")
-                        .WithMany()
-                        .HasForeignKey("TutorAllocationId");
+                        .HasForeignKey("StudentSignUpId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("StudentSignUp");
-
-                    b.Navigation("TutorAllocation");
                 });
 
             modelBuilder.Entity("BrightBoostApplication.Models.Session", b =>

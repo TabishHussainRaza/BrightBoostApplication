@@ -1,0 +1,635 @@
+@{
+    ViewBag.Title = "Tutor Questions Management";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">Tutor Questions</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary">
+                    <i class='fa fa-plus' style='color: white'></i>
+                    Add
+                </button>
+                <input type="hidden" value="@ViewBag.SessionDateTime" id="session_time" />
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="questions" class="table table-bordered table-striped" style="border-spacing: 0;"
+                               width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<br />
+
+<div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <table style="width: 100%">
+                    <tr>
+                        <td style="width: 100%">
+                            <h4 class="modal-title" id="myModalLabel">Add Question</h4>
+                        </td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="question_title"><b>Question Title</b></label>
+                        <input type="text" id="question_title" class="form-control" name="question_title"
+                               style="width:100%" />
+                        <span id="question_empty_error" class="text-danger small" style="display:none">
+                            Question Title
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="description"><b>Description </b></label>
+                        <input type="text" id="description" class="form-control" name="description"
+                               style="width:100%" />
+                        <span id="description_empty_error" class="text-danger small" style="display:none">
+                            Description
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="answer"><b>Answer</b></label>
+                        <textarea type="text" id="answer" class="form-control" style="width: 100%"
+                                  name="answer"></textarea>
+                        <span id="answer_empty_error" class="text-danger small" style="display:none">
+                            Answer
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary addItem" id="btnSaveitem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="editModalLabel">Edit Question</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit_question_Id" class="form-control" style="width: 100%" name="Id" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="edit_question_title"><b>Questions Title</b></label>
+                        <input type="text" readonly id="edit_question_title" class="form-control" style="width: 100%"
+                               name="QuestionTitle" />
+                        <span id="edit_term_empty_error" class="text-danger small" style="display:none">
+                            Questions Title
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="edit_description"><b>Description</b></label>
+                        <textarea type="text" readonly id="edit_description" class="form-control" style="width: 100%"
+                                  name="edit_description"></textarea>
+                        <span id="edit_sd_empty_error" class="text-danger small" style="display:none">
+                            Description
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="edit_answer"><b>Answer</b></label>
+                        <textarea type="text" id="edit_answer" class="form-control" style="width: 100%"
+                                  name="edit_answer"></textarea>
+                        <span id="edit_sd_empty_error" class="text-danger small" style="display:none">
+                            Answer
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary" id="btnSaveEdit">Save Changes</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--info Modal-->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="infoModalLabel">Question</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="info_question_Id" class="form-control" style="width: 100%" name="Id" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="info_question_title"><b>Questions Title</b></label>
+                        <input type="text" readonly id="info_question_title" class="form-control" style="width: 100%"
+                               name="QuestionTitle" />
+                        <span id="info_term_empty_error" class="text-danger small" style="display:none">
+                            Questions Title
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="info_description"><b>Description</b></label>
+                        <textarea type="text" readonly id="info_description" class="form-control" style="width: 100%"
+                                  name="info_description"></textarea>
+                        <span id="info_sd_empty_error" class="text-danger small" style="display:none">
+                            Description
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="label" for="info_answer"><b>Answer</b></label>
+                        <textarea type="text" readonly id="info_answer" class="form-control" style="width: 100%"
+                                  name="info_answer"></textarea>
+                        <span id="info_sd_empty_error" class="text-danger small" style="display:none">
+                            Answer
+                            Required
+                        </span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="assignModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Subjects</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Subjects</label>
+                    <select id="select_item_list" class="form-control item-selection" name="select_item_list"
+                            multiple></select>
+                </div>
+                <input type="hidden" class="form-control" id="addMappingTermId" name="addSubjects">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAddSubjects">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
+@section scripts
+    {
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>
+    <script>
+        var statusArray = [];
+        $(document).ready(function () {
+            var DataTable = null;
+            var date = '@ViewBag.SessionDateTime.ToString()';
+            function getAll() {
+                $.blockUI({ message: '<p>Loading..</p>' });
+                $.ajax({
+                    type: "GET",
+                    url: "/TutorQuestions/GetAllMySessionQuestions?SessionId=" + @ViewBag.SessionId + "&SessionDateTime=" + date,
+                    success: function (result) {
+                        $.unblockUI();
+                        if (result.success) {
+                            if (DataTable == null) {
+                                console.log(result)
+                                initializeDataTable(result.questions);
+                                saveStatus(result.questions)
+                            } else {
+                                console.log(result)
+                                updateDataTable(result.questions);
+                            }
+                        } else {
+                            console.log("No Items found.");
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+            function saveStatus(data) {
+                statusArray = []
+                for (let i = 0; i < data.length; i++) {
+                    statusArray.push({
+                        id: data[i].id,
+                        status: data[i].status
+                    })
+                }
+                console.log(statusArray)
+            }
+            function updateDataTable(updatedData) {
+                DataTable.clear().rows.add(updatedData).draw();
+            }
+            function initializeDataTable(data) {
+                DataTable = $(`#questions`).DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: 'Question Title',
+                            data: "title",
+                        },
+                        {
+                            title: 'Description',
+                            render: function (data, type, row, meta) {
+                                return row.description
+                            }
+                        },
+                        {
+                            title: 'Answered',
+                            render: function (data, type, row, meta) {
+                                var text;
+                                if (row.status) {
+                                    text = "Yes"
+                                } else {
+                                    text = "No"
+                                }
+                                return text;
+                            }
+                        },
+                        {
+                            title: 'Action',
+                            render: function (data, type, row, meta) {
+                                var text = '<div style="display:flex; justify-content:space-around">';
+                                text += `
+                                                <a href="#" class="btn-icon-split btn-sm btn btn-info js-info" data-id="${row.id}">
+                                                <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-eye' style='color: white' data-id="${row.id}"></i></span>
+                                                </a>
+                                                <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
+                                                <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
+                                                </a>
+                                                `;
+                                text += '</div>'
+                                return text;
+                            }
+                        },
+                    ]
+                });
+            }
+            getAll();
+            init();
+            function populateModal(id) {
+                $.ajax({
+                    url: "/TutorQuestions/Details/" + id,
+                    type: "GET",
+                    success: function (data) {
+                        if (data) {
+                            $("#info_question_Id").val(id);
+                            $("#info_question_title").val(data.question.title);
+                            $("#info_description").val(data.question.description);
+                            $("#info_answer").val(data.question.answer);
+                            $("#infoModal").modal("show");
+                        } else {
+                            swal({
+                                title: 'No details found!',
+                                text: 'Could Not find details!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal({
+                            title: 'No details found!',
+                            text: 'Could Not find details!',
+                            option: "error",
+                            icon: "error",
+                            timer: 3000
+                        });
+                    }
+                });
+            }
+            function populateEditModal(id) {
+                $.ajax({
+                    url: "/TutorQuestions/Details/" + id,
+                    type: "GET",
+                    success: function (data) {
+                        if (data) {
+                            $("#edit_question_Id").val(id);
+                            $("#edit_question_title").val(data.question.title);
+                            $("#edit_description").val(data.question.description);
+                            $("#editModal").modal("show");
+                        } else {
+                            swal({
+                                title: 'No details found!',
+                                text: 'Could Not find details!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal({
+                            title: 'No details found!',
+                            text: 'Could Not find details!',
+                            option: "error",
+                            icon: "error",
+                            timer: 3000
+                        });
+                    }
+                });
+            }
+            function init() {
+                $("#addNew").on("click", function (e) {
+                    $('#addNewModal').modal('show');
+                    $('#addNewModal').on('hidden.bs.modal', function () {
+                        $('#question_title').val('');
+                        $('#question_empty_error').css("display", "none");
+                        $('#description').val('');
+                        $('#description_empty_error').css("display", "none");
+                    });
+                })
+                $('#btnSaveitem').on('click', function (e) {
+                    if (!validateForm()) {
+                        return;
+                    } else {
+                        var data = {
+                            Title: $("#question_title").val(),
+                            Description: $("#description").val(),
+                            TutorAllocationId: @ViewBag.TutorAllId,
+                            Answer: $("#answer").val(),
+                            Date: $("#session_time").val(),
+                        };
+                        data = JSON.stringify(data)
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            dataType: "json",
+                            contentType: "application/json",
+                            url: "/TutorQuestions/Create",
+                            success: function (result) {
+                                if (result) {
+                                    $('#question_title').val();
+                                    $('#addNewModal').modal('hide');
+                                    swal({
+                                        title: 'Question Added!',
+                                        text: 'Successfully Created!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAll();
+                                } else {
+                                    swal({
+                                        title: 'Question Addition Failed!',
+                                        text: 'Could Not be Added!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            },
+                            error: function (data) {
+                                console.log(data);
+                            }
+                        });
+                    }
+                });
+                $("#questions").on("click", ".js-delete", function (e) {
+                    var data = {
+                        id: $(e.target).data('id')
+                    };
+                    swal({
+                        title: "Comfirmation",
+                        text: "Are you sure you want to delete the question!",
+                        icon: "warning",
+                        buttons: [
+                            'No',
+                            'Yes'
+                        ],
+                        dangerMode: true,
+                    }).then(function (isConfirm) {
+                        if (isConfirm) {
+                            $.blockUI({ message: '<p> Loading..</p>' });
+                            $.ajax({
+                                type: "DELETE",
+                                data: data,
+                                url: "/TutorQuestions/" + data.id,
+                                dataType: "json",
+                                success: function (result) {
+                                    $.unblockUI();
+                                    if (result) {
+                                        swal({
+                                            title: 'Question Deleted!',
+                                            text: 'Successfully Deleted!',
+                                            option: "success",
+                                            icon: "success",
+                                            timer: 3000
+                                        });
+                                        getAll();
+                                    } else {
+                                        swal({
+                                            title: 'Question Deletion Failed!',
+                                            text: 'Could Not be Deleted!',
+                                            option: "error",
+                                            icon: "error",
+                                            timer: 3000
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            swal("Cancelled", "Question Not deleted", "error");
+                        }
+                    })
+                });
+                $("#questions").on("click", ".js-info", function (e) {
+                    var questionId = $(this).data("id");
+                    populateModal(questionId);
+                });
+                $("#questions").on("click", ".js-update", function (e) {
+                    var questionId = $(this).data("id");
+                    for (let i = 0; i < statusArray.length; i++) {
+                        if (questionId == statusArray[i].id) {
+                            if (statusArray[i].status) {
+                                //this quesion has been marked,can not be opened
+                                swal({
+                                    title: 'Question Locked!',
+                                    text: 'Cannot be opened!',
+                                    option: "error",
+                                    icon: "error",
+                                    timer: 3000
+                                });
+                                return;
+                            }
+                        }
+                    }
+                    populateEditModal(questionId);
+                });
+                $("#btnSaveEdit").click(function () {
+                    var updatedData = {
+                        Answer: $("#edit_answer").val(),
+                    };
+                    AnswerQuestion(updatedData);
+                });
+                $("#questions").on("click", ".change_status", function (e) {
+                    var questionId = parseInt($(e.target).data('id'), 10);
+                    swal({
+                        title: "Comfirmation",
+                        text: "Are you sure you want to mark this question?",
+                        icon: "warning",
+                        buttons: [
+                            'No',
+                            'Yes'
+                        ],
+                        dangerMode: true,
+                    }).then(function (isConfirm) {
+                        if (isConfirm) {
+                            $.blockUI({ message: '<p> Loading..</p>' });
+                            $.ajax({
+                                type: "PUT",
+                                url: "/TutorQuestions/UpdateStatus/" + questionId,
+                                dataType: "json",
+                                contentType: "application/json",
+                                success: function (result) {
+                                    $.unblockUI();
+                                    if (result) {
+                                        swal({
+                                            title: 'Question Status Updated!',
+                                            text: 'Successfully Updated!',
+                                            option: "success",
+                                            icon: "success",
+                                            timer: 3000
+                                        });
+                                        getAll();
+                                    } else {
+                                        swal({
+                                            title: 'Question Status Change Failed!',
+                                            text: 'Could Not be Changed!',
+                                            option: "error",
+                                            icon: "error",
+                                            timer: 3000
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            swal("Cancelled", "Question Status Not Updated", "error");
+                        }
+                    })
+                });
+            }
+            function AnswerQuestion(updatedData) {
+                var questionId = parseInt($("#edit_question_Id").val(), 10);
+                $.ajax({
+                    url: "/TutorQuestions/" + questionId,
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(updatedData),
+                    success: function (response) {
+                        if (response.success === true) {
+                            //  close the edit modal
+                            $("#editModal").modal("hide");
+                            swal({
+                                title: 'Question Answered!',
+                                text: 'Successfully Answered!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAll();
+                        } else {
+                            swal({
+                                title: 'Question Answer Failed!',
+                                text: 'Could Not be Answered!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal({
+                            title: 'Term Update Failed!',
+                            text: 'Could Not be Answered!',
+                            option: "error",
+                            icon: "error",
+                            timer: 3000
+                        });
+                    }
+                });
+            }
+            function validateForm() {
+                var title = $("#question_title").val();
+                var description = $("#description").val();
+                var answer = $("#answer").val();
+                var isValid = true;
+
+                // Check if title is empty
+                if (title === "") {
+                    $("#question_empty_error").show();
+                    isValid = false;
+                } else {
+                    $("#question_empty_error").hide();
+                }
+
+                // Check if description is empty
+                if (description === "") {
+                    $("#description_empty_error").show();
+                    isValid = false;
+                } else {
+                    $("#description_empty_error").hide();
+                }
+
+                if (answer === "") {
+                    $("#answer_empty_error").show();
+                    isValid = false;
+                } else {
+                    $("#answer_empty_error").hide();
+                }
+
+                return isValid;
+            }
+        });
+    </script>
+}

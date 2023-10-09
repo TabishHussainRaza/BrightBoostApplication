@@ -6,11 +6,14 @@
         public string title { get; set; }
         public string description { get; set; }
         public string answer { get; set; }
+        public DateTime? sessionDate { get; set; }
         public DateTime createdDate { get; set; }
         public DateTime updateDate { get; set; }
-        public Nullable<bool> status { get; set; }
-        public int order { get; set; }
-        public int fkId { get; set; }
-        public StudentSignUp StudentSignUp { get; set; }
+        public Nullable<bool> status { get; set; } = false;
+        public int order { get; set; } = 0;
+        public int? StudentSignUpId { get; set; }
+        public StudentSignUp? StudentSignUp { get; set; }
+        public int? TutorAllocationId { get; set; }
+        public TutorAllocation? TutorAllocation { get; set; }
     }
 }

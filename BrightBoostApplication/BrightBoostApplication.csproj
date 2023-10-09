@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
+<!--    <Nullable>enable</Nullable>-->
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-BrightBoostApplication-a782c3ce-14f6-41ff-89c5-9817c261616d</UserSecretsId>
   </PropertyGroup>
