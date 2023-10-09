@@ -107,7 +107,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="@Url.Action("Dashboard", "StudentsTerm")" class="nav-link @((controller.Equals("StudentsTerm") && (!action.Equals("TimeTable") && !action.Equals("Index"))) ? "active" : "")">
+                                <a href="@Url.Action("Dashboard", "StudentsTerm")" class="nav-link @(((controller.Equals("StudentsTerm")) && (!action.Equals("TimeTable") && !action.Equals("Index")) || controller.Equals("StudentQuestions")) ? "active" : "")">
                                     <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>Dashboard</p>
                                 </a>
@@ -131,7 +131,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="@Url.Action("Dashboard", "Tutors")" class="nav-link @((controller.Equals("Tutors") || controller.Equals("Attendance")) ? "active" : "")">
+                                <a href="@Url.Action("Dashboard", "Tutors")" class="nav-link @((controller.Equals("Tutors") || controller.Equals("Attendance") || controller.Equals("TutorQuestions")) ? "active" : "")">
                                     <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>Dashboard</p>
                                 </a>
@@ -141,12 +141,6 @@
                                 class="nav-link @((controller.Equals("Expertises") && action.Equals("Index")) ? "active" : "")">
                                     <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
                                     <p>My Profile</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="@Url.Action("Index", "TutorQuestions")" class="nav-link">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    <p>Question</p>
                                 </a>
                             </li>
                         }
