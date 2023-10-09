@@ -389,6 +389,7 @@ namespace BrightBoostApplication.Controllers
 
                         while (sessionDate <= termEndDate)
                         {
+                            var att = _context.Attendances.Where(a => a.StudentSignUp.SessionId == allocations.Id && a.StudentSignUp.StudentId == student.Id && a.AttendanceDateTime == sessionDate).FirstOrDefault();
                             var mySession = new SessionViewModel()
                             {
                                 SessionName = allocations.SessionName,
@@ -396,7 +397,8 @@ namespace BrightBoostApplication.Controllers
                                 SessionVenue = allocations.SessionVenue,
                                 Id = allocations.Id,
                                 TermCourse = new TermCourse(), // Create a new instance to avoid object cycle
-                                startTime = sessionDate // Assign the calculated session date to startTime
+                                startTime = sessionDate,
+                                Attendance = att != null && att.status.Value ? 1 : 0
                             };
 
                             sessionsList.Add(mySession);
@@ -460,6 +462,7 @@ namespace BrightBoostApplication.Controllers
 
                         while (sessionDate <= termEndDate)
                         {
+                            var att = _context.Attendances.Where(a => a.StudentSignUp.SessionId == sc.Id && a.StudentSignUp.StudentId == student.Id && a.AttendanceDateTime == sessionDate).FirstOrDefault();
                             var mySession = new SessionViewModel()
                             {
                                 SessionName = sc.TermCourse.Title + " " + sc.SessionName,
@@ -467,7 +470,7 @@ namespace BrightBoostApplication.Controllers
                                 SessionVenue = sc.SessionVenue,
                                 Id = sc.Id,
                                 TermCourse = new TermCourse(), // Create a new instance to avoid object cycle
-                                startTime = sessionDate // Assign the calculated session date to startTime
+                                startTime = sessionDate, // Assign the calculated session date to startTime
                             };
 
                             sessionsList.Add(mySession);

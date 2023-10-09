@@ -218,7 +218,11 @@
                             title: 'Action',
                             render: function (data, type, row, meta) {
                                 var text = '<div style="display:flex; justify-content:space-around">';
-                                text += `<a href="#" class="btn-icon-split btn-sm btn btn-info js-assign" data-id="${row.id}">
+                                text += `<a href="/Sessions/CurrentSessions?id=${row.id}" class="btn-icon-split btn-sm btn btn-secondary" data-id="${row.id}">
+                                                        <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-eye' style='color: white' data-id="${row.id}"></i></span>
+                                                        </a>
+                                
+                                <a href="#" class="btn-icon-split btn-sm btn btn-info js-assign" data-id="${row.id}">
                                                              <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-person' style='color: white' data-id="${row.id}"></i></span>
                                                                 </a>
                                 

@@ -194,6 +194,7 @@ namespace BrightBoostApplication.Controllers
 
                         while (sessionDate <= termEndDate)
                         {
+                            var totalAtt = _context.Attendances.Where(a => a.StudentSignUp.SessionId == allocations.Id && a.AttendanceDateTime == sessionDate).Count();
                             var mySession = new SessionViewModel()
                             {
                                 SessionName = allocations.SessionName,
@@ -201,7 +202,8 @@ namespace BrightBoostApplication.Controllers
                                 SessionVenue = allocations.SessionVenue,
                                 Id = allocations.Id,
                                 TermCourse = new TermCourse(),
-                                startTime = sessionDate, // Assign the calculated session date to startTime
+                                startTime = sessionDate,
+                                Attendance = totalAtt > 0 ? totalAtt : -1
                             };
 
                             sessionsList.Add(mySession);
