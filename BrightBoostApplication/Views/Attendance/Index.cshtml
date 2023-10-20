@@ -101,10 +101,25 @@
                     data: data,
                     dataType: 'json',
                     success: function (response) {
-                        console.log(response);
+                        if (response){
+                            swal({
+                                title: 'Success',
+                                text: "Updated",
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                        }
+                        
                     },
                     error: function (error) {
-                        // Handle errors if the request fails
+                        swal({
+                            title: 'Error',
+                            text: error,
+                            option: "success",
+                            icon: "success",
+                            timer: 3000
+                        });
                     }
                 });
             }
