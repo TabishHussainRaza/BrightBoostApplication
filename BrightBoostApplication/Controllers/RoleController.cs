@@ -159,6 +159,7 @@ namespace Identity.Controllers
                                     userId = RoleAssignModel.userId,
                                     createdDate = DateTime.Now,
                                     updateDate = DateTime.Now,
+                                    Availability ="",
                                     isActive= true,
                                 };
                                 _context.Add(tutor);
