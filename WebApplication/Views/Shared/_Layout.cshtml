@@ -1,0 +1,151 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["Controller"];
+    var action = ViewContext.RouteData.Values["Action"];
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Bright Boost</title>
+    <link href="~/lib/adminlte/dist/css/adminlte.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/sweetalert.min.css" rel="stylesheet" />
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-sm-inline-block">
+                    @Html.ActionLink("Tutoring System", "Index", "Home", null, new { @class = "nav-link" })
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </a>
+                </li>
+                <partial name="_LoginPartial" />
+            </ul>
+
+
+        </nav>
+        <aside class="main-sidebar sidebar-light-primary elevation-4">
+            <div style="text-align: center; padding:0px">
+                <a href="@Url.Action("Index", "Home")" class="brand-link" style="text-decoration:none">
+                    <span class="brand-text font-weight-light">Bright Boost</span>
+                </a>
+            </div>
+
+            <div class="sidebar">
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="false">
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "AdminDashboard")"
+                                class="nav-link @((controller.Equals("AdminDashboard") ) ? "active" : "")">
+                                    <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item @(((new[] { "User", "Role", "RetailerGroups"}.Contains(controller))) ? "menu-is-opening menu-open" : "")">
+                                <a href="#" class="nav-link @(((new[] { "User", "Role", "RetailerGroups"}.Contains(controller))) ? "active" : "")">
+                                    <i class="nav-icon fas fa-cogs"></i>
+                                    <p>Administration<i class="fas fa-angle-left right"></i></p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("Index", "User")"
+                                        class="nav-link @((controller.Equals("User") && action.Equals("Index")) ? "active" : "")">
+                                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                            <p>Users Management</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item ">
+                                        <a href="@Url.Action("Index", "Role")"
+                                        class="nav-link @((controller.Equals("Role") && action.Equals("Index")) ? "active" : "")">
+                                            <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
+                                            <p>Roles Management</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item ">
+                                        <a href="@Url.Action("Index", "RetailerGroups")"
+                                           class="nav-link @((controller.Equals("RetailerGroups") && action.Equals("Index")) ? "active" : "")">
+                                            <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
+                                            <p>Retailers</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <br />
+            <div class="content">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+        <footer class="main-footer">
+            <strong>Copyright &copy; @DateTime.Now.Year Bright Boost. </strong> All rights reserved.
+        </footer>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/jquery.blockui.js"></script>
+    <script src="~/js/sweetalert.min.js"></script>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script type="text/javascript">
+            $('#logout').on('click', function (e) {
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to logout!",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Account/Logout",
+                            success: function (result) {
+                                if (result) {
+                                    window.location.href = 'Index.html';
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "Logout Cancelled", "success");
+                    }
+                })
+            });
+        </script>
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
