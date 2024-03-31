@@ -74,6 +74,7 @@
                     success: function (result) {
                         if (result) {
                             $("#myModalLabel").html("View Details");
+                            $("#modalContentBody").empty();
                             $("#modalContentBody").append(renderHtml("Name:", `${result.firstName} ${result.lastName}`));
                             $("#modalContentBody").append(renderHtml("Email:", `${result.UserName}`));
                             $("#modalContentBody").append(renderHtml("Address:", `${result.FormattedAddress ?? '<i>Not Recorded</i>'}`));
