@@ -33,7 +33,7 @@ namespace WebApplication.Controllers
         public async Task<JsonResult> GetAll()
         {
             var retailers = new List<Retailer>();
-            if (_context.Branches != null)
+            if (_context.Retailers != null)
             {
                 retailers = await _context.Retailers.Where(i => i.IsActive == true).ToListAsync();
             }

@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "Customers View";
+    ViewBag.description = "Customers";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">@ViewBag.description</h3>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/css/geocode.css" rel="stylesheet" />
+
+@Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = "viewCustomer"})
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/js/geocode.js"></script>
+    <script src="~/js/helperfunctions.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var url = "Customers/GetAll";
+            var tableId = `#@ViewBag.description`;
+
+            var columns = [
+                {
+                    title: 'Customer Name',
+                    render: function (data, type, row, meta) {
+                        return `${row.firstName} ${row.lastName}`;
+                    }
+                },
+                {
+                    title: 'View Details',
+                    render: function (data, type, row, meta) {
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `<a href="#" class="btn-icon-split btn-sm btn btn-info js-view" data-id="${row?.UserId}">
+                                        <span class="icon text-white-50" data-id="${row?.UserId}"><i class='fa fa-eye' style='color: white' data-id="${row?.UserId}"></i></span>
+                                                </a> `;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+            ];
+
+            getAll(url, tableId, columns);
+
+            $(tableId).on("click", ".js-view", function (e) {
+                var id = $(e.target).data('id');
+                getDataDetails(id);
+                $("#assignRoleId").val(id);
+            });
+
+            function getDataDetails(id) {
+                $.ajax({
+                    type: "GET",
+                    url: `/Customers/Details?id=${id}`,
+                    success: function (result) {
+                        if (result) {
+                            $("#myModalLabel").html("View Details");
+                            $("#modalContentBody").append(renderHtml("Name:", `${result.firstName} ${result.lastName}`));
+                            $("#modalContentBody").append(renderHtml("Email:", `${result.UserName}`));
+                            $("#modalContentBody").append(renderHtml("Address:", `${result.FormattedAddress ?? '<i>Not Recorded</i>'}`));
+                            $('#btn_viewCustomer').hide();
+                            $('#viewCustomer').modal('show');
+                        }else{
+                            swal({
+                                title: 'Unable to get Details!',
+                                text: `Try again}`,
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function renderHtml(label, value){
+                return `<div class="row">
+                            <div class="col-md-6">
+                                      ${label}
+                            </div>
+                            <div class="col-md-6">
+                                         ${value}
+                            </div>
+                          </div>`;
+            }
+        });
+
+    </script>
+}
