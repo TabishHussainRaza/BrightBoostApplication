@@ -96,6 +96,11 @@ function createForm(title, mainDivId, formFields, callBack) {
         if (field.HtmlType === 'input') {
             input = $('<input type="' + field.inputType + '">');
             input.attr('placeholder', `Enter ${field.placeHolder}`);
+
+            if (field.data != null) {
+                input.val(field.data);
+            }
+
         } else if (field.HtmlType === 'div') {
             input = $('<div></div>');
         }
@@ -149,7 +154,8 @@ function processForm(modalId, url, message) {
         data[field.id] = $('#' + field.id).val();
     });
 
-    data['Id'] = $(`#btn_${modalId}`).data('id') ?? 0;
+    var id = $(`#btn_${modalId}`).data('id') ?? 0;
+    data['Id'] = id;
 
     $.ajax({
         type: "POST",
@@ -165,7 +171,7 @@ function processForm(modalId, url, message) {
 
                 swal({
                     title: 'Success!',
-                    text: `${message} ${data.id == null ? 'Added' : 'Updated'}`,
+                    text: `${message} ${id == 0 ? 'Added' : 'Updated'}`,
                     option: "success",
                     icon: "success",
                     timer: 3000
@@ -175,7 +181,7 @@ function processForm(modalId, url, message) {
             } else {
                 swal({
                     title: 'Unsuccessful!',
-                    text: `Unable to ${data.id == null ? 'added' : 'updated'} ${message}`,
+                    text: `Unable to ${id == 0 ? 'added' : 'updated'} ${message}`,
                     option: "error",
                     icon: "error",
                     timer: 3000

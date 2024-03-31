@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication.Data;
 
@@ -11,13 +12,14 @@ using WebApplication.Data;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240311043003_updates")]
+    partial class updates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.28")
+                .HasAnnotation("ProductVersion", "6.0.27")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -214,10 +216,6 @@ namespace WebApplication.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int")
-                        .HasColumnName("GroupId");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -402,27 +400,6 @@ namespace WebApplication.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("WebApplication.Models.Document", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("DocumentPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Document");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Inventory", b =>
@@ -740,17 +717,6 @@ namespace WebApplication.Migrations
                     b.Navigation("ProductType");
                 });
 
-            modelBuilder.Entity("WebApplication.Models.Document", b =>
-                {
-                    b.HasOne("WebApplication.Models.Product", "Product")
-                        .WithMany("ImagePaths")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("WebApplication.Models.Inventory", b =>
                 {
                     b.HasOne("WebApplication.Models.Branch", "Branch")
@@ -871,11 +837,6 @@ namespace WebApplication.Migrations
             modelBuilder.Entity("WebApplication.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("WebApplication.Models.Product", b =>
-                {
-                    b.Navigation("ImagePaths");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Retailer", b =>

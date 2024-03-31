@@ -9,5 +9,6 @@ namespace WebApplication.Models
         public string firstName { get; set; }
         public string lastName { get; set; }
         public Nullable<bool> isActive { get; set; }
+        public int? GroupId { get; set; }
     }
 }

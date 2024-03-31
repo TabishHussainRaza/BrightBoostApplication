@@ -51,6 +51,12 @@ namespace WebApplication.Data
                 .HasForeignKey<Order>(o => o.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(e => e.GroupId)
+                .HasColumnName("GroupId")
+                .HasColumnType("int")
+                .IsRequired(false);
+
         }
     }
 }

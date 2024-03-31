@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,53 +12,49 @@ using WebApplication.Models.ViewModel;
 
 namespace WebApplication.Controllers
 {
-    public class RetailerGroupsController : Controller
+    public class CategoryTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
         private IMapper? _mapper;
 
-        public RetailerGroupsController(ApplicationDbContext context, IMapper mapper)
+        public CategoryTypesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        // GET: RetailerGroups
-        public async Task<IActionResult> Index()
+        // GET: CategoryTypes
+        public IActionResult Index()
         {
-              return View(await _context.Branches.ToListAsync());
+              return View();
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAllRetailer()
+        public async Task<JsonResult> GetAll()
         {
-            var retailer = new List<Branch>();
-            if (_context.Branches != null)
+            var categoryTypes = new List<CategoryType>();
+            if (_context.CategoryTypes != null)
             {
-                retailer = await _context.Branches.Where(i => i.IsActive == true).ToListAsync();
+                categoryTypes = await _context.CategoryTypes.Where(i => i.IsActive == true).ToListAsync();
             }
-            return Json(retailer);
+            return Json(categoryTypes);
         }
 
         [HttpPost]
-        public async Task<JsonResult> CreateRetailer([FromBody] BranchVM GroupModel)
+        public async Task<JsonResult> Save([FromBody] CategoryTypeVM Model)
         {
             var storingState = 0;
 
-            if (GroupModel?.Id != 0) { 
-                var existing = await _context.Branches.Where(i => i.Id == GroupModel.Id).FirstOrDefaultAsync();
+            if (Model?.Id != 0)
+            {
+                var existing = await _context.CategoryTypes.Where(i => i.Id == Model.Id).FirstOrDefaultAsync();
 
                 if (existing == null)
                 {
                     return Json(false);
                 }
-                existing.GroupName = GroupModel.GroupName;
-                existing.FormattedAddress = GroupModel.FormattedAddress;
-                existing.Latitude = GroupModel.Latitude;
-                existing.Longitude = GroupModel.Longitude;
-                existing.ContactName = GroupModel.ContactName;
-                existing.ContactEmail = GroupModel.ContactEmail;
-                existing.ContactPhone = GroupModel.ContactPhone;
+
+                existing.TypeName = Model.TypeName;
                 existing.CreatedDateTime = DateTime.UtcNow;
                 existing.LastUpdateDateTime = DateTime.UtcNow;
 
@@ -69,11 +63,11 @@ namespace WebApplication.Controllers
                 return Json(storingState);
             }
 
-            var group = _mapper.Map<Branch>(GroupModel);
-            group.IsActive = true;
-            group.CreatedDateTime = DateTime.UtcNow;
-            group.LastUpdateDateTime = DateTime.UtcNow;
-            _context.Branches.Add(group);
+            var type = _mapper.Map<CategoryType>(Model);
+            type.IsActive = true;
+            type.CreatedDateTime = DateTime.UtcNow;
+            type.LastUpdateDateTime = DateTime.UtcNow;
+            _context.CategoryTypes.Add(type);
             storingState = await _context.SaveChangesAsync();
             return Json(storingState);
         }
@@ -81,12 +75,12 @@ namespace WebApplication.Controllers
         [HttpGet]
         public async Task<JsonResult> Details(int? id)
         {
-            if (id == null || _context.Branches == null)
+            if (id == null || _context.CategoryTypes == null)
             {
                 return Json(false);
             }
 
-            var Group = await _context.Branches
+            var Group = await _context.CategoryTypes
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (Group == null)
             {
@@ -97,14 +91,14 @@ namespace WebApplication.Controllers
         }
 
         [HttpDelete]
-        public async Task<JsonResult> DeleteRetailer(int? id)
+        public async Task<JsonResult> Delete(int? id)
         {
-            if (id == null || _context.Branches == null)
+            if (id == null || _context.CategoryTypes == null)
             {
                 return Json(false);
             }
 
-            var Group = await _context.Branches
+            var Group = await _context.CategoryTypes
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (Group == null)
             {

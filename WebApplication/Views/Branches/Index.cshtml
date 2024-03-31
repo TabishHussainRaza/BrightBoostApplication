@@ -1,0 +1,415 @@
+﻿@{
+    ViewBag.Title = "Group Management";
+    ViewBag.description = "Branch";
+    ViewBag.addModalId = "branchModal";
+    ViewBag.userModalId = "userModal";
+}
+
+<div class="">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#tab1">Branches</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#tab2">Users</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <div id="tab1" class="tab-pane fade show active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mr-auto">@ViewBag.description Management</h3>
+                        <div class="btn-group" role="group">
+                            <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive">
+                                    <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+        <div id="tab2" class="tab-pane fade">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mr-auto">User Manager</h3>
+                        <div class="btn-group" role="group">
+                            <button id="addNewUser" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive">
+                                    <table id="user" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <br />
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="assignRoleModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Assign Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Roles</label>
+                    <select id="select_item_list" class="form-control item-selection" name="select_item_list" multiple></select>
+                </div>
+
+                <input type="hidden" class="form-control assignRole" id="assignRoleId" name="assignRole">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAssignRole">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.addModalId})
+@Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.userModalId, specialContentId = "_user"})
+
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" />
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/css/geocode.css" rel="stylesheet" />
+<link href="~/css/styles.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/js/geocode.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js"></script>s
+    
+
+    <script src="~/js/helperclass.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+
+            var BranchHelperFunctions = new HelperFunctionsClass();
+
+            $('.nav-tabs a').click(function () {
+                $(this).tab('show');
+            });
+
+            var retailerId = `@ViewBag.retailerId`;
+            var url = `Branches/GetAll?id=${retailerId}`;
+            var tableId = `#@ViewBag.description`;
+            var modalAddId = `@ViewBag.addModalId`;
+
+            var fields = [
+                { id: 'GroupName', attribute: 'groupName', class: 'form-control', label: 'Branch Name', placeHolder: 'Group Name', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true, data: null },
+                { id: 'FormattedAddress', attribute: 'formattedAddress', class: 'form-control', label: 'formattedAddress', placeHolder: 'formattedAddress', HtmlType: 'input', inputType: 'text', visible: false, isRequired: true, data: null },
+                { id: 'Latitude', attribute: 'latitude', class: 'form-control', label: 'latitude', placeHolder: 'latitude', HtmlType: 'input', inputType: 'number', visible: false, isRequired: true, data: null },
+                { id: 'Longitude', attribute: 'longitude', class: 'form-control', label: 'longitude', placeHolder: 'longitude', HtmlType: 'input', inputType: 'number', visible: false, isRequired: true, data: null },
+                { id: 'autocomplete-container', attribute: 'formattedAddress', class: 'autocomplete-container', label: 'Address', placeHolder: 'Address', HtmlType: 'div', inputType: null, visible: true, isRequired: false, data: null },
+                { id: 'ContactName', attribute: 'contactName', class: 'form-control', label: 'Contact Name', placeHolder: 'Contact Name', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true, data: null },
+                { id: 'ContactEmail', attribute: 'contactEmail', class: 'form-control', label: 'Contact Email', placeHolder: 'Contact Email', HtmlType: 'input', inputType: 'email', visible: true, isRequired: true, data: null },
+                { id: 'ContactPhone', attribute: 'contactPhone', class: 'form-control', label: 'Contact Phone', placeHolder: 'Contact Phone', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true, data: null },
+                { id: 'RetailerId', attribute: 'retailerId', class: 'form-control', label: 'Retailer Id', placeHolder: 'Retailer Id', HtmlType: 'input', inputType: 'number', visible: false, isRequired: true, data: retailerId },
+            ];
+
+            var columns = [
+                {
+                    title: 'Group Name',
+                    data: 'groupName'
+                },
+                {
+                    title: 'Action',
+                    render: function (data, type, row, meta) {
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row?.id}">
+                                        <span class="icon text-white-50" data-id="${row?.id}"><i class='fa fa-pencil' style='color: white' data-id="${row?.id}"></i></span>
+                                        </a>
+                                        <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row?.id}">
+                                        <span class="icon text-white-50"  data-id="${row?.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row?.id}"></i></span>
+                                        </a>`;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+            ];
+
+            BranchHelperFunctions.getAll(url, tableId, columns);
+
+            BranchHelperFunctions.createForm("Add Branch", modalAddId, 'modalContentBody', fields, () => {
+                addressAutocomplete(document.getElementById("autocomplete-container"), (data) => {
+                    $('#Latitude').val(data?.properties?.lat);
+                    $('#FormattedAddress').val(data?.properties?.formatted);
+                    $('#Longitude').val(data?.properties?.lon);
+                }, {
+                    placeholder: "Enter an address here"
+                });
+            });
+
+            BranchHelperFunctions.showModalAndRegisterEventListener('#addNew', modalAddId, 'Branches/Save', 'Group', () => { $('#address').val(''); }, "Add Branch");
+
+            $(tableId).on("click", ".js-update", function (e) {
+                var Id = $(this).data("id");
+                BranchHelperFunctions.renderUpdateData(`Branches/Details?id=${Id}`, () => { $('#address').val($('#FormattedAddress').val()) });
+                $(`#btn_${modalAddId}`).data('id', Id);
+                $(`#${modalAddId}`).find("#myModalLabel").html("Update Branch");
+                $(`#${modalAddId}`).modal('show');
+            });
+
+            $(tableId).on("click", ".js-delete", function (e) {
+                var Id = $(this).data("id");
+                BranchHelperFunctions.registerDeleteEvent(`Branches/Delete?id=${Id}`);
+            });
+
+
+            var userHelperFunctions = new HelperFunctionsClass();
+
+            var userGetUrl = `Staffs/GetAllUsers?id=${retailerId}`;
+            var usertableId = `#user`;
+            var userModalAddId = `@ViewBag.userModalId`;
+
+            var modalFields = [
+                { id: 'firstName', attribute: 'firstName', class: 'form-control addField', label: 'First Name', placeHolder: 'First Name', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true, data: null },
+                { id: 'lastName', attribute: 'lastName', class: 'form-control addField', label: 'Last Name', placeHolder: 'Last Name', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true, data: null },
+                { id: 'email', attribute: 'email', class: 'form-control addField', label: 'Email', placeHolder: 'Email', HtmlType: 'input', inputType: 'text', visible: true, isRequired: false, data: null },
+                { id: 'password', attribute: 'password', class: 'form-control addField', label: 'Password', placeHolder: 'Password', HtmlType: 'input', inputType: 'password', visible: true, isRequired: false, data: null },
+                { id: 'groupId', attribute: 'groupId', class: 'form-control', label: 'Retailer Id', placeHolder: 'Retailer Id', HtmlType: 'input', inputType: 'number', visible: false, isRequired: true, data: retailerId },
+                { id: 'userId', attribute: 'userId', class: 'form-control', label: 'userId', placeHolder: 'userId', HtmlType: 'input', inputType: 'text', visible: false, isRequired: true, data: null },
+            ];
+
+
+            var userColumns = [
+                {
+                    title: 'First name',
+                    data: 'firstName'
+                },
+                {
+                    title: 'Last name',
+                    data: 'lastName'
+                },
+                {
+                    title: 'Email',
+                    data: 'email'
+                },
+                {
+                    title: 'Active',
+                    render: function (data, type, row, meta) {
+
+                        var condition = row.isActive == true ? 'checked' : '';
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `<input type='checkbox' class ="change_user_status" id="${row.id}_chk_status" data-id="${row.id}" ${condition}/>`;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+                {
+                    title: 'Action',
+                    render: function (data, type, row, meta) {
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `
+                        <a href="#" class="btn-icon-split btn-sm btn btn-info js-assign" data-id="${row.id}">
+                                                     <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-person' style='color: white' data-id="${row.id}"></i></span>
+                                                        </a>
+                                <a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row.id}">
+                                <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-pencil' style='color: white' data-id="${row.id}"></i></span>
+                                </a>`;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+            ];
+
+            userHelperFunctions.getAll(userGetUrl, usertableId, userColumns);
+            userHelperFunctions.createForm("Add User", userModalAddId, 'modalContentBody', modalFields);
+
+            userHelperFunctions.showModalAndRegisterEventListener('#addNewUser', userModalAddId, 'User/Save', 'user', ()=>{ $("#password_group").show();}, "Add User");
+
+
+            $(usertableId).on("click", ".js-update", function (e) {
+                var Id = $(this).data("id");
+                userHelperFunctions.renderUpdateData(`User/Details?id=${Id}`);
+                $(`#userId`).val(Id);
+                $("#password_group").hide();
+                $(`#btn_${userModalAddId}`).data('id', 1);
+                $(`#${userModalAddId}`).find("#myModalLabel").html("Update User");
+                $(`#${userModalAddId}`).modal('show');
+                
+            });
+
+            function loadOptionItems(id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Role/GetAllRoles",
+                    success: function (result) {
+                        if(result){
+                            $('#select_item_list').html('');
+                            $('#select_item_list').append($("<option></option>"));
+                            $.each(result, function (index, item) {
+                                $('#select_item_list').append($('<option></option>').val(item.id).html(item.name));
+                            });
+
+                            $.ajax({
+                                type: "GET",
+                                dataType: "json",
+                                data: {
+                                    userId: id
+                                },
+                                url: "/Role/GetMyUserRoles",
+                                success: function (res) {
+                                    $('#assignRoleModal #select_item_list').select2({
+                                        placeholder: 'Select Roles',
+                                        dropdownParent: $('#assignRoleModal'),
+                                        tags: true
+                                    });
+                                    if (res) {
+                                        var roleMappedList = res.map(a => a.id);
+                                        $("#select_item_list").val(roleMappedList).trigger('change');
+                                    } else {
+                                        console.log("No Roles found.");
+                                    }
+                                },
+                                error: function (error) {
+                                    $.unblockUI();
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            $(usertableId).on("click", ".js-assign", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                $('#assignRoleModal').modal('show');
+                loadOptionItems(data.id);
+
+                $("#assignRoleId").val(data.id);
+            });
+
+            $('#btnAssignRole').on('click', function (e) {
+                var roleIds = $("#select_item_list").val();
+                var requestData = {
+                    userId:  $("#assignRoleId").val()
+                };
+
+                if (roleIds && roleIds.length > 0) {
+                    requestData.RoleIds = roleIds;
+                    requestData.RoleName = $("#select_item_list").text();
+                } else {
+                    requestData.removeAll = true;
+                }
+
+                $.ajax({
+                    url: "/Role/AddRoleMapping",
+                    type: "POST",
+                    data: requestData,
+                    dataType: "json",
+                    success: function (data) {
+                        $('#assignRoleModal').modal('hide');
+                        if (data) {
+                            swal({
+                                title: 'User Role(s) Updated!',
+                                text: 'Successfully Updated!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                            getAllUsers();
+                        } else {
+                            swal({
+                                title: 'User Role(s) Change Failed!',
+                                text: 'Could Not be Changed!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.error("Error:", status, error);
+                    },
+                });
+            });
+
+            $("#user").on("click", ".change_user_status", function (e) {
+                var data = {
+                    id: $(e.target).data('id')
+                };
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to change the user status?",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        data.isActive = $(`#${data.id}_chk_status`).prop("checked");
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "POST",
+                            data: data,
+                            url: "/User/ChangeUserStatus",
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'User Status Updated!',
+                                        text: 'Successfully Updated!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+                                    getAllUsers();
+                                } else {
+                                    swal({
+                                        title: 'User Status Change Failed!',
+                                        text: 'Could Not be Changed!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "User Status Not Updated", "error");
+                    }
+                });
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Category Product Types Management";
+    ViewBag.description = "Types";
+    ViewBag.addModalId = "subTypeModal";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">@ViewBag.Title</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+@Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.addModalId})
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/css/geocode.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/js/geocode.js"></script>
+    <script src="~/js/helperfunctions.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var categoryTypeId = `@ViewBag.typeId`;
+            var url = `CategorySubTypes/GetAll?id=${categoryTypeId}`;
+            var tableId = `#@ViewBag.description`;
+            var modalAddId = `@ViewBag.addModalId`;
+
+            var fields = [
+                { id: 'SubTypeName', attribute: 'subTypeName', class: 'form-control', label: 'Category Sub Type Name', placeHolder: 'Sub Type Name', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true},
+                { id: 'ProductTypeId', attribute: 'productTypeId', class: 'form-control', label: 'type Id', placeHolder: 'type Id', HtmlType: 'input', inputType: 'number', visible: false, isRequired: true, data: categoryTypeId },
+            ];
+
+            var columns = [
+                {
+                    title: 'Sub Type Name',
+                    data: 'subTypeName'
+                },
+                {
+                    title: 'Action',
+                    render: function (data, type, row, meta) {
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row?.id}">
+                                        <span class="icon text-white-50" data-id="${row?.id}"><i class='fa fa-pencil' style='color: white' data-id="${row?.id}"></i></span>
+                                        </a>
+                                        <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row?.id}">
+                                        <span class="icon text-white-50"  data-id="${row?.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row?.id}"></i></span>
+                                        </a>`;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+            ];
+
+            getAll(url, tableId, columns);
+
+            createForm("Add Sub Type", 'modalContentBody', fields);
+
+            showModalAndRegisterEventListener('#addNew', modalAddId, 'CategorySubTypes/Save', 'Category Sub Types');
+
+            $(tableId).on("click", ".js-update", function (e) {
+                var Id = $(this).data("id");
+                renderUpdateData(`CategorySubTypes/Details?id=${Id}`);
+                $(`#btn_${modalAddId}`).data('id', Id);
+                $(`#${modalAddId}`).modal('show');
+            });
+
+            $(tableId).on("click", ".js-delete", function (e) {
+                var Id = $(this).data("id");
+                deleteData(`CategorySubTypes/Delete?id=${Id}`);
+            });
+
+        });
+
+    </script>
+}

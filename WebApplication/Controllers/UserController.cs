@@ -5,6 +5,8 @@ using WebApplication.Models;
 using AutoMapper;
 using WebApplication.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
+using WebApplication.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Controllers
 {
@@ -36,13 +38,58 @@ namespace Identity.Controllers
                 lastName = model.lastName,
                 UserName = model.Email,
                 Email = model.Email,
-                isActive = true
+                isActive = true,
+                GroupId = model.groupId
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
                 return Json(true);
             }
+            return Json(false);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> SaveAsync([FromBody] SaveUserViewModel model)
+        {
+            if(model == null)
+            {
+                return Json(false);
+            }
+
+            if (string.IsNullOrWhiteSpace(model.userId))
+            {
+                var newUser = new ApplicationUser
+                {
+                    firstName = model.firstName,
+                    lastName = model.lastName,
+                    UserName = model.email,
+                    Email = model.email,
+                    isActive = true,
+                    GroupId = model.groupId
+                };
+                var result = await _userManager.CreateAsync(newUser, model.password);
+                if (result.Succeeded)
+                {
+                    return Json(true);
+                }
+                return Json(false);
+            }
+
+            var user = await _userManager.FindByIdAsync(model.userId);
+            if (user != null)
+            {
+                user.UserName = model.email;
+                user.Email = model.email;
+                user.firstName = model.firstName;
+                user.lastName = model.lastName;
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return Json(true);
+                }
+            }
+
             return Json(false);
         }
 
@@ -104,5 +151,11 @@ namespace Identity.Controllers
             return Json(false);
         }
 
+        [HttpGet]
+        public async Task<JsonResult> Details(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            return Json(user);
+        }
     }
 }

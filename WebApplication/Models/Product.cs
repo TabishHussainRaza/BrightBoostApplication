@@ -10,5 +10,6 @@
         public bool IsActive { get; set; }
         public int CategorySubTypeId { get; set; }
         public CategorySubType CategorySubType { get; set; }
+        public IList<Document> ImagePaths { get; set; } = new List<Document>();
     }
 }

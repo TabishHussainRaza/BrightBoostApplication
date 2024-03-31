@@ -11,6 +11,7 @@ namespace WebApplication.Mapper
         public MappingProfile()
         {
             CreateMap<IdentityRole, RoleModel>().ReverseMap();
+            CreateMap<RetailerVM, Retailer>().ReverseMap();
             CreateMap<BranchVM, Branch>().ReverseMap();
         }
     }

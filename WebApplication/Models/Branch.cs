@@ -14,7 +14,7 @@
         public DateTime LastUpdateDateTime { get; set; }
         public bool IsActive { get; set; }
         public IList<Staff> Staff { get; set; } = new List<Staff>();
-        public int ReatilerId { get; set; }
+        public int RetailerId { get; set; }
         public Retailer Retailer { get; set; }
     }
 }

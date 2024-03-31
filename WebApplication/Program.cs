@@ -3,6 +3,8 @@ using WebApplication.Data;
 using WebApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using WebApplication.Utility;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthorization();
+
+builder.Services.AddTransient<DataAccess>(_ => new DataAccess(connectionString));
 
 var app = builder.Build();
 
