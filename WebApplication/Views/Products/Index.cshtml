@@ -1,0 +1,239 @@
+﻿@{
+    ViewBag.Title = "Product Management";
+    ViewBag.description = "Product";
+    ViewBag.addModalId = "productModal";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">@ViewBag.description Management</h3>
+            <div class="btn-group" role="group">
+                <button id="addNew" class="btn btn-primary"> <i class='fa fa-plus' style='color: white'></i> Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+@Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.addModalId})
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/css/geocode.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.css"/>
+
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/js/geocode.js"></script>
+    <script src="~/js/helperfunctions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js"></script>
+    <script>
+
+        Dropzone.autoDiscover = false;
+
+        $(document).ready(function () {
+
+            var url = "Products/GetAll";
+            var tableId = `#@ViewBag.description`;
+            var modalAddId = `@ViewBag.addModalId`;
+            var categories = [];
+
+            getCategory();
+            var columns = [
+                {
+                    title: 'Product Name',
+                    data: 'name'
+                },
+                {
+                    title: 'Short Description',
+                    data: 'shortDescription'
+                },
+                {
+                    title: 'Action',
+                    render: function (data, type, row, meta) {
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row?.id}">
+                                                <span class="icon text-white-50" data-id="${row?.id}"><i class='fa fa-pencil' style='color: white' data-id="${row?.id}"></i></span>
+                                                </a>
+                                                <a href="#" class="btn-icon-split btn-sm btn btn-danger js-delete" data-id="${row?.id}">
+                                                <span class="icon text-white-50"  data-id="${row?.id}"><i class="fa fa fa-trash" style='color: white'  data-id="${row?.id}"></i></span>
+                                                </a>`
+                            ;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+            ];
+
+            getAll(url, tableId, columns);
+
+            $(tableId).on("click", ".js-update", function (e) {
+                var Id = $(this).data("id");
+                $("#myModalLabel").html("Update Product");
+
+                renderUpdateData(`Products/Details?id=${Id}`, ()=>{
+                        var id = $("#catgeory").val();
+                        getSubTypes(id, () => { $('#CategorySubTypeId').val($('#CategorySubTypeId_Temp').val())
+                    });
+                }, true);
+
+                $(`#btn_${modalAddId}`).data('id', Id);
+                $(`#${modalAddId}`).modal('show');
+
+                $(`#${modalAddId}`).on('hidden.bs.modal', function () {
+                    $('#filesProductDiv').remove();
+                });
+            });
+
+            $(tableId).on("click", ".js-delete", function (e) {
+                var Id = $(this).data("id");
+                deleteData(`Products/Delete?id=${Id}`);
+            });
+
+            function getCategory() {
+                $.ajax({
+                    type: "GET",
+                    url: `CategoryTypes/GetAll`,
+                    success: function (result) {
+                        if (result) {
+                            categories = result;
+                            
+                            var fields = [
+                                { id: 'Name', attribute: 'name', class: 'form-control', label: 'Product Name', placeHolder: 'Product Name', HtmlType: 'input', inputType: 'text', visible: true, isRequired: true },
+                                { id: 'ShortDescription', attribute: 'shortDescription', class: 'form-control', label: 'Short Description', placeHolder: 'Short Description', HtmlType: 'textarea', inputType: '25', visible: true, isRequired: true },
+                                { id: 'LongDescription', attribute: 'longDescription', class: 'form-control', label: 'Details', placeHolder: 'Details', HtmlType: 'textarea', inputType: 'text', visible: true, isRequired: true },
+                                { id: 'Price', attribute: 'price', class: 'form-control', label: 'Price', placeHolder: 'Price', HtmlType: 'input', inputType: 'number', visible: true, isRequired: true },
+                                { id: 'catgeory', attribute: 'category', class: 'form-control', label: 'Product Category', placeHolder: 'Product Category', HtmlType: 'select', inputType: '', visible: true, isRequired: true, data: result },
+                                { id: 'CategorySubTypeId', attribute: 'categorySubTypeId', class: 'form-control', label: 'Product Sub-Category', placeHolder: 'Product Sub Category', HtmlType: 'select', inputType: '', visible: true, isRequired: true },
+                                { id: 'CategorySubTypeId_Temp', attribute: 'categorySubTypeId', class: 'form-control', label: 'Product Sub-Category', placeHolder: '', HtmlType: 'input', inputType: 'number', visible: false, isRequired: false },
+                            ];
+
+                            var dz = null;
+                            
+                            createForm("Add Product", 'modalContentBody', fields, ()=>{
+
+                                $('#catgeory').on('change', function () {
+                                    var id = $(this).val();
+                                    getSubTypes(id);
+                                });
+
+                                $('#modalContentBody').append(`<div class="col-md-12" id='dropzoneDiv'>
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Product Uploads</h3>
+                                            </div>
+                                            <div class="card-body register-card-body">
+                                                <div class="form-row">
+                                                    <div class="col-md-12" id="dropzone">
+                                                        <div class="dropzone"
+                                                              id="file-upload" >
+                                                            <div class="text-danger"></div>
+                                                            <div class="form-row">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>`);
+
+                                $("#file-upload").dropzone({
+                                    autoProcessQueue: false,
+                                    url: "Products/Upload",
+                                    paramName: "files",
+                                    maxFilesize: 5, //mb
+                                    maxThumbnailFilesize: 1, //mb
+                                    maxFiles: 5,
+                                    parallelUploads: 5,
+                                    acceptedFiles: ".jpeg,.png,.jpg",
+                                    uploadMultiple: true,
+                                    addRemoveLinks: true,
+
+                                    init: function () {
+                                        dz = this;
+                                    },
+                                    success: function (file) {
+                                        var preview = $(file.previewElement);
+                                        preview.addClass("dz-success text-success");
+                                        setTimeout(function () {
+                                            dz.removeFile(file);
+                                        }, 2000);
+
+                                    },
+                                    queuecomplete: function () {
+
+                                    },
+                                    dictDefaultMessage: "You can drag and drop your images here.",
+                                    dictRemoveFile: "File Remove"
+                                });
+                            }, 2);
+                            
+                            showModalAndRegisterEventListener('#addNew', modalAddId, 'Products/Save', 'Product', null, true, dz);
+
+                        } else {
+                            swal({
+                                title: 'Unable to get Details!',
+                                text: `Try again`,
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            function getSubTypes(id, callback) {
+                $.ajax({
+                    type: "GET",
+                    url: `CategorySubTypes/GetAll?id=${id}`,
+                    success: function (result) {
+                        if (result) {
+                            $('#CategorySubTypeId').html('');
+                            $('#CategorySubTypeId').append($("<option>Select Sub Type</option>"));
+                            result.forEach(function (item) {
+                                var option = $('<option></option>');
+                                option.val(item.id);
+                                option.text(item.subTypeName);
+                                $('#CategorySubTypeId').append(option);
+                            });
+
+                            if(callback){
+                                callback();
+                            }
+                        } else {
+                            swal({
+                                title: 'Unable to get Details!',
+                                text: `Try again`,
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+        });
+
+    </script>
+}

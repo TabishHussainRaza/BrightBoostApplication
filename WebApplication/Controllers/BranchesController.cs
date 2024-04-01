@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +25,23 @@ namespace WebApplication.Controllers
         }
 
         // GET: Branches
-        public IActionResult Index(int? id)
+        public async Task<IActionResult> Index(int? id)
         {
-            if (id == null || _context.Retailers == null)
+            if (_context.Retailers == null)
             {
                 return Redirect("Home/Error");
             }
-            ViewBag.retailerId = _context.Retailers.Where(ret => ret.Id == id).Select(re => re.Id).FirstOrDefault();
+
+            if(id.HasValue)
+            {
+                ViewBag.retailerId = _context.Retailers.Where(ret => ret.Id == id).Select(re => re.Id).FirstOrDefault();
+            }
+            else
+            {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var groupId = await _context.Users.Where(user => user.Id == userId).Select(us => us.GroupId).FirstOrDefaultAsync();
+                ViewBag.retailerId = groupId;
+            }
             return View();
         }
 

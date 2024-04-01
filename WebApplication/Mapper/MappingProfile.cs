@@ -13,6 +13,7 @@ namespace WebApplication.Mapper
             CreateMap<IdentityRole, RoleModel>().ReverseMap();
             CreateMap<RetailerVM, Retailer>().ReverseMap();
             CreateMap<BranchVM, Branch>().ReverseMap();
+            CreateMap<ProductVM, Product>().ReverseMap();
         }
     }
 }

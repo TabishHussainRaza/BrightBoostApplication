@@ -81,6 +81,7 @@
 
             $(tableId).on("click", ".js-update", function (e) {
                 var Id = $(this).data("id");
+                $("#myModalLabel").html("Update Category Type");
                 renderUpdateData(`CategoryTypes/Details?id=${Id}`);
                 $(`#btn_${modalAddId}`).data('id', Id);
                 $(`#${modalAddId}`).modal('show');

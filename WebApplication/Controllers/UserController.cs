@@ -32,6 +32,7 @@ namespace Identity.Controllers
         [HttpPost]
         public async Task<JsonResult> AddAsync(CreateUserViewModel model)
         {
+            //Main Group User Management
             var user = new ApplicationUser
             {
                 firstName = model.firstName,
@@ -39,7 +40,7 @@ namespace Identity.Controllers
                 UserName = model.Email,
                 Email = model.Email,
                 isActive = true,
-                GroupId = model.groupId
+                GroupId = 1
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)

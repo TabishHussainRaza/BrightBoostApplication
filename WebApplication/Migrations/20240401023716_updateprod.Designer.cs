@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication.Data;
 
@@ -11,9 +12,10 @@ using WebApplication.Data;
 namespace WebApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240401023716_updateprod")]
+    partial class updateprod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,7 +194,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("WebApplication.Models.ApplicationUser", b =>
@@ -321,7 +323,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("RetailerId");
 
-                    b.ToTable("Branches", (string)null);
+                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("WebApplication.Models.CategorySubType", b =>
@@ -351,7 +353,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("ProductTypeId");
 
-                    b.ToTable("CategorySubTypes", (string)null);
+                    b.ToTable("CategorySubTypes");
                 });
 
             modelBuilder.Entity("WebApplication.Models.CategoryType", b =>
@@ -376,7 +378,7 @@ namespace WebApplication.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CategoryTypes", (string)null);
+                    b.ToTable("CategoryTypes");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Customer", b =>
@@ -401,7 +403,7 @@ namespace WebApplication.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Document", b =>
@@ -415,9 +417,6 @@ namespace WebApplication.Migrations
                     b.Property<string>("DocumentPath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -425,7 +424,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Document", (string)null);
+                    b.ToTable("Document");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Inventory", b =>
@@ -460,7 +459,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Inventory", (string)null);
+                    b.ToTable("Inventory");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Order", b =>
@@ -498,7 +497,7 @@ namespace WebApplication.Migrations
                     b.HasIndex("TransactionId")
                         .IsUnique();
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("WebApplication.Models.OrderItem", b =>
@@ -533,7 +532,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Product", b =>
@@ -569,7 +568,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("CategorySubTypeId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Retailer", b =>
@@ -594,7 +593,7 @@ namespace WebApplication.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Retailers", (string)null);
+                    b.ToTable("Retailers");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Staff", b =>
@@ -624,7 +623,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("BranchId");
 
-                    b.ToTable("Staffs", (string)null);
+                    b.ToTable("Staffs");
                 });
 
             modelBuilder.Entity("WebApplication.Models.Transaction", b =>
@@ -659,7 +658,7 @@ namespace WebApplication.Migrations
 
                     b.HasIndex("OrderId1");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -20,6 +20,7 @@ namespace WebApplication.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Inventory> Inventory { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Document> Document { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
