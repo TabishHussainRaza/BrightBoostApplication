@@ -130,41 +130,6 @@ namespace Identity.Controllers
                     {
                         var roleDetails = await roleManager.FindByIdAsync(id);
                         var currResult = await userManager.AddToRoleAsync(user, roleDetails.Name);
-
-                        if(roleDetails.NormalizedName == "STUDENT")
-                        {
-                            /*var existingStudent = _context.Student.Where(s => s.userId == RoleAssignModel.userId).FirstOrDefault();
-                            if(existingStudent == null)
-                            {
-                                var student = new Student()
-                                {
-                                    userId = RoleAssignModel.userId,
-                                    createdDate = DateTime.Now,
-                                    updateDate = DateTime.Now,
-                                    isActive = true,
-                                };
-                                _context.Add(student);
-                                _context.SaveChanges();
-                            }*/
-                        }
-
-                        if (roleDetails.NormalizedName == "TUTOR")
-                        {
-                            /*var existingTutor = _context.Tutors.Where(s => s.userId == RoleAssignModel.userId).FirstOrDefault();
-                            if (existingTutor == null)
-                            {
-                                var tutor = new Tutor()
-                                {
-                                    userId = RoleAssignModel.userId,
-                                    createdDate = DateTime.Now,
-                                    updateDate = DateTime.Now,
-                                    Availability ="",
-                                    isActive= true,
-                                };
-                                _context.Add(tutor);
-                                _context.SaveChanges();
-                            }*/
-                        }
                         result.Add(currResult);
                     }
 

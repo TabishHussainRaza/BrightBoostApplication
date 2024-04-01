@@ -93,6 +93,29 @@
     </div>
 </div>
 
+<div class="modal fade" id="assignBranch" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Assign Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="select_item_list" class="form-label">Branch</label>
+                    <select id="select_item_list_branch" class="form-control item-selection" name="select_item_list_branch" multiple></select>
+                </div>
+
+                <input type="hidden" class="form-control currentUserIdInput" id="currentUserId" name="currentUserId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAssignBranch">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.addModalId})
 @Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.userModalId, specialContentId = "_user"})
 
@@ -231,6 +254,9 @@
                     render: function (data, type, row, meta) {
                         var text = '<div style="display:flex; justify-content:space-around">';
                         text += `
+                                <a href="#" class="btn-icon-split btn-sm btn btn-info js-branch" data-id="${row.id}">
+                                                             <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-chain' style='color: white' data-id="${row.id}"></i></span>
+                                                                </a>
                         <a href="#" class="btn-icon-split btn-sm btn btn-info js-assign" data-id="${row.id}">
                                                      <span class="icon text-white-50" data-id="${row.id}"><i class='fa fa-person' style='color: white' data-id="${row.id}"></i></span>
                                                         </a>
@@ -282,8 +308,7 @@
                                 success: function (res) {
                                     $('#assignRoleModal #select_item_list').select2({
                                         placeholder: 'Select Roles',
-                                        dropdownParent: $('#assignRoleModal'),
-                                        tags: true
+                                        dropdownParent: $('#assignRoleModal')
                                     });
                                     if (res) {
                                         var roleMappedList = res.map(a => a.id);
@@ -405,6 +430,96 @@
                     } else {
                         swal("Cancelled", "User Status Not Updated", "error");
                     }
+                });
+            });
+
+            function loadBranches(id) {
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    success: function (result) {
+                        if (result) {
+                            $('#select_item_list_branch').html('');
+                            $('#select_item_list_branch').append($("<option></option>"));
+                            $.each(result, function (index, item) {
+                                $('#select_item_list_branch').append($('<option></option>').val(item.id).html(item.groupName));
+                            });
+
+                            $.ajax({
+                                type: "GET",
+                                url: "/Staffs/GetMyBranch?userId=" + id,
+                                success: function (res) {
+                                    $(' #select_item_list_branch').select2({
+                                        placeholder: 'Select Branch',
+                                        dropdownParent: $('#assignBranch'),
+                                        maximumSelectionLength: 1
+                                    });
+                                    if (res) {
+                                        $("#select_item_list_branch").val(res).trigger('change');
+                                    } else {
+                                        console.log("No Branches found.");
+                                    }
+                                },
+                                error: function (error) {
+                                    $.unblockUI();
+                                }
+                            });
+                        }
+                    },
+                    error: function (error) {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+            $(usertableId).on("click", ".js-branch", function (e) {
+                var id = $(e.target).data('id');
+                $('#assignBranch').modal('show');
+                loadBranches(id);
+                $("#currentUserId").val(id);
+            });
+
+            $('#btnAssignBranch').on('click', function (e) {
+                var branchId = $("#select_item_list_branch").val();
+                var requestData = {
+                    userId: $("#currentUserId").val()
+                };
+
+                if (branchId !=null && branchId.length > 0) {
+                    requestData.branchId = branchId;
+                } else {
+                    requestData.remove = true;
+                }
+
+                $.ajax({
+                    url: "/Staffs/SaveBranch",
+                    type: "POST",
+                    data: requestData,
+                    dataType: "json",
+                    success: function (data) {
+                        $('#assignBranch').modal('hide');
+                        if (data) {
+                            swal({
+                                title: 'User Branch Updated!',
+                                text: 'Successfully Updated!',
+                                option: "success",
+                                icon: "success",
+                                timer: 3000
+                            });
+                        } else {
+                            swal({
+                                title: 'User Branch Change Failed!',
+                                text: 'Could Not be Changed!',
+                                option: "error",
+                                icon: "error",
+                                timer: 3000
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.error("Error:", status, error);
+                    },
                 });
             });
         });
