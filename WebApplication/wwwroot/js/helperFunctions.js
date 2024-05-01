@@ -165,13 +165,13 @@ function showModalAndRegisterEventListener(buttonId, modalId, url, message, call
         $(`#${modalId}`).modal('show');
         $(`#${modalId}`).on('hidden.bs.modal', function () {
 
-            if (callBack) {
-                callBack();
-            }
-
             MyFormFields.forEach(function (field) {
                 $('#' + field.id).val('');
             });
+
+            if (callBack) {
+                callBack();
+            }
         });
     });
 

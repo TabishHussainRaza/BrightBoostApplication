@@ -55,13 +55,13 @@
                         data-accordion="false">
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Administrator"))
                         {
-                            @*                            <li class="nav-item">
-                        <a href="@Url.Action("Index", "AdminDashboard")"
-                        class="nav-link @((controller.Equals("AdminDashboard") ) ? "active" : "")">
-                        <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
-                        <p>Dashboard</p>
-                        </a>
-                        </li>*@
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "Orders")"
+                                   class="nav-link @((controller.Equals("Orders") ) ? "active" : "")">
+                                    <i class="fas fa-cubes fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Orders</p>
+                                </a>
+                            </li>
                             <li class="nav-item @(((new[] { "User", "Role", "Retailers", "Branches", "CategorySubTypes", "CategoryTypes"}.Contains(controller))) ? "menu-is-opening menu-open" : "")">
                                 <a href="#" class="nav-link @(((new[] { "User", "Role", "Retailers", "Branches", "CategorySubTypes", "CategoryTypes"}.Contains(controller))) ? "active" : "")">
                                     <i class="nav-icon fas fa-cogs"></i>
@@ -100,7 +100,7 @@
                             </li>
                         }
 
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Retail Administrator"))
+                        @if (User.Identity.IsAuthenticated && (User.IsInRole("Branch Administrator") || User.IsInRole("Retail Administrator")))
                         {
                             <li class="nav-item">
                                 <a href="@Url.Action("Index", "Products")"
@@ -118,10 +118,22 @@
                             </li>
 
                         }
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Branch Administrator"))
+                        @if (User.Identity.IsAuthenticated && (User.IsInRole("Branch Administrator") || User.IsInRole("Staff")))
                         {
-                           
-
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "Orders")"
+                                   class="nav-link @((controller.Equals("Orders") ) ? "active" : "")">
+                                    <i class="fas fa-shopping-cart fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Orders</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "Inventories")"
+                                   class="nav-link @((controller.Equals("Inventories") ) ? "active" : "")">
+                                    <i class="fas fa-check fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <p>Inventory</p>
+                                </a>
+                            </li>
                         }
                     </ul>
                 </nav>

@@ -1,0 +1,99 @@
+﻿@using static WebApplication.Enums.Enums;
+@model IEnumerable<WebApplication.Models.Order>
+
+@{
+    ViewData["Title"] = "Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">Orders Management</h3>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="orders" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Status)
+                                    </th>
+                                    <th>
+                                        Order Placed On
+                                    </th>
+                                    <th>
+                                        Order Last Updated
+                                    </th>
+                                    <th>
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @GetStatusDescription(item.Status)
+                                        </td>
+                                        <td>
+                                            @item.CreatedDateTime.ToLocalTime()
+                                        </td>
+                                        <td>
+                                            @item.LastUpdateDateTime.ToLocalTime()
+                                        </td>
+                                        <td>
+                                            <div style="display:flex; justify-content:space-around">
+                                                <a class="btn-icon-split btn-sm btn btn-info" asp-action="Details" asp-route-id="@item.Id"><span class="icon text-white-50"><i class='fa fa-eye' style='color: white'></i></span></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#orders').DataTable();
+        });
+
+    </script>
+}
+
+@functions {
+    public string GetStatusDescription(int status)
+    {
+        switch (status)
+        {
+            case (int)Status.Started:
+                return "Order Placed";
+            case (int)Status.Processing:
+                return "In Processing";
+            case (int)Status.Shipped:
+                return "Processing Completed and the item has been shipped";
+            case (int)Status.Delivered:
+                return "The items has been successfully delivered";
+            default:
+                return "";
+        }
+    }
+}

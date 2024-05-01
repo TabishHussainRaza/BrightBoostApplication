@@ -1,0 +1,170 @@
+﻿@using static WebApplication.Enums.Enums;
+@model WebApplication.Models.ViewModel.OrderVM
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">Order: @Model.Id</h3>
+            <div class="btn-group" role="group">
+                @if (Model.Status == 1)
+                {
+                    <button id="process" class="btn btn-success">
+                        Process
+                    </button>
+                }
+                else if (Model.Status == 2)
+                {
+                    <button id="process" class="btn btn-success">
+                        Prepare for Delivery
+                    </button>
+                }
+                else if (Model.Status == 3)
+                {
+                    <button id="process" class="btn btn-success">
+                       Complete
+                    </button>
+                }
+                
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div col="md-12">
+                    <h3><b>Customer Details</b></h3>
+                    <p><b>First Name</b>: @Model.FirstName</p>
+                    <p><b>Last Name</b>: @Model.LastName</p>
+                    <p><b>Email</b>: @Model.Email</p>
+                    <p><b>Address</b>: @Model.FormattedAddress</p>
+                    <p><b>Status</b>: @GetStatusDescription(Model.Status)</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="orders" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Item Name
+                                    </th>
+                                    <th>
+                                       Quantity
+                                    </th>
+                                    <th>
+                                        Price
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <tr>
+                                        <td>
+                                           @item.ProductDetails.Name
+                                        </td>
+                                        <td>
+                                            @item.Quantity
+                                        </td>
+                                        <td>
+                                             @item.ProductDetails.Price
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#orders').DataTable();
+
+            $('#process').click(function () {
+                swal({
+                    title: "Comfirmation",
+                    text: "Are you sure you want to proceed to next stage?",
+                    icon: "warning",
+                    buttons: [
+                        'No',
+                        'Yes'
+                    ],
+                    dangerMode: true,
+                }).then(function (isConfirm) {
+                    if (isConfirm) {
+                        $.blockUI({ message: '<p> Loading..</p>' });
+                        $.ajax({
+                            type: "POST",
+                            url: "/Orders/Save?orderId=" + @Model.Id,
+                            dataType: "json",
+                            success: function (result) {
+                                $.unblockUI();
+                                if (result) {
+                                    swal({
+                                        title: 'Proccessed!',
+                                        text: 'Successfully Proccessed!',
+                                        option: "success",
+                                        icon: "success",
+                                        timer: 3000
+                                    });
+
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 3000);
+
+                                } else {
+                                    swal({
+                                        title: 'Failed to Proccess!',
+                                        text: 'Could Not be Proccessed!',
+                                        option: "error",
+                                        icon: "error",
+                                        timer: 3000
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "No action taken", "error");
+                    }
+                });
+            });
+        });
+
+    </script>
+}
+
+@functions {
+    public string GetStatusDescription(int status)
+    {
+        switch (status)
+        {
+            case (int)Status.Started:
+                return "Order Placed";
+            case (int)Status.Processing:
+                return "In Processing";
+            case (int)Status.Shipped:
+                return "Processing Completed and the item has been shipped";
+            case (int)Status.Delivered:
+                return "The items has been successfully delivered";
+            default:
+                return "";
+        }
+    }
+}

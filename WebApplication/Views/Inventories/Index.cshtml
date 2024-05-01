@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "Inventory";
+    ViewBag.description = "Inventory";
+    ViewBag.addModalId = "inventory";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h3 class="mr-auto">@ViewBag.description Management</h3>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table id="@ViewBag.description" class="table table-bordered table-striped" style="border-spacing: 0;" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+@Html.Partial("~/Views/Shared/_ModalTemplate.cshtml", new { Id = @ViewBag.addModalId})
+
+<link href="~/lib/datatables/datatables.min.css" rel="stylesheet" />
+@section scripts
+    {
+
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="~/js/geocode.js"></script>
+    <script src="~/js/helperfunctions.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var url = "Inventories/GetAll";
+            var tableId = `#@ViewBag.description`;
+            var modalAddId = `@ViewBag.addModalId`;
+
+            var fields = [
+                { id: 'Quantity', attribute: 'quantity', class: 'form-control', label: 'Quantity', placeHolder: 'Quantity', HtmlType: 'input', inputType: 'number', visible: true, isRequired: true },
+                { id: 'ProductId', attribute: 'productId', class: 'form-control', label: 'ProductId', placeHolder: 'ProductId', HtmlType: 'input', inputType: 'number', visible: false, isRequired: true },
+            ];
+
+            var columns = [
+                {
+                    title: 'Product Name',
+                    data: 'Name'
+                },
+                {
+                    title: 'Short Description',
+                    data: 'ShortDescription'
+                },
+                {
+                    title: 'Action',
+                    render: function (data, type, row, meta) {
+                        var text = '<div style="display:flex; justify-content:space-around">';
+                        text += `<a href="#" class="btn-icon-split btn-sm btn btn-warning js-update" data-id="${row?.Id}" data-inventoryid="${row?.InventoryId}">
+                                                           <span class="icon text-white-50" data-id="${row?.Id}" data-inventoryid="${row?.InventoryId}"><i class='fa fa-pencil' style='color: white' data-inventoryid="${row?.InventoryId}" data-id="${row?.Id}"></i></span>
+                                                        </a>`
+                            ;
+                        text += '</div>'
+                        return text;
+                    }
+                },
+            ];
+
+
+            getAll(url, tableId, columns);
+
+            createForm("Add Retailer", 'modalContentBody', fields);
+
+            showModalAndRegisterEventListener('#addNew', modalAddId, 'Inventories/Save', 'Inventory');
+
+            $(tableId).on("click", ".js-update", function (e) {
+                var Id = $(this).data("id");
+                $("#myModalLabel").html("Update Inventory");
+                renderUpdateData(`Inventories/Details?id=${Id}`);
+                $(`#btn_${modalAddId}`).data('id', $(this).data("inventoryid"));
+                $(`#${modalAddId}`).modal('show');
+            });
+
+
+        });
+
+    </script>
+}

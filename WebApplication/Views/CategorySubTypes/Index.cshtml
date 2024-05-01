@@ -75,7 +75,7 @@
 
             createForm("Add Sub Type", 'modalContentBody', fields);
 
-            showModalAndRegisterEventListener('#addNew', modalAddId, 'CategorySubTypes/Save', 'Category Sub Types');
+            showModalAndRegisterEventListener('#addNew', modalAddId, 'CategorySubTypes/Save', 'Category Sub Types', () => { $("#ProductTypeId").val(categoryTypeId) });
 
             $(tableId).on("click", ".js-update", function (e) {
                 var Id = $(this).data("id");
